@@ -57,3 +57,447 @@ Claude Code를 최대한 활용하기 위한 팁입니다. 커스텀 status line
 - [Tip 45: Quick setup script](#tip-45-quick-setup-script)
 
 <!-- /TOC -->
+
+## Tip 0: Customize your status line
+
+Claude Code 하단의 status line을 커스터마이즈하여 유용한 정보를 표시할 수 있습니다. 저는 모델, 현재 디렉토리, git 브랜치(있는 경우), 커밋되지 않은 파일 수, origin과의 동기화 상태, 토큰 사용량의 시각적 진행률 바를 표시하도록 설정했습니다. 또한 마지막 메시지를 보여주는 두 번째 줄이 있어 대화 내용을 기억할 수 있습니다:
+
+```
+Opus 4.5 | 📁claude-code-tips | 🔀main (scripts/context-bar.sh uncommitted, synced 12m ago) | ██░░░░░░░░ 18% of 200k tokens
+💬 This is good. I don't think we need to change the documentation as long as we don't say that the default color is orange el...
+```
+
+이는 특히 컨텍스트 사용량을 모니터링하고 작업 중인 내용을 기억하는 데 유용합니다. 스크립트는 10가지 색상 테마(orange, blue, teal, green, lavender, rose, gold, slate, cyan, gray)를 지원합니다.
+
+![Color preview options](../scripts/color-preview.png)
+
+설정하려면 [샘플 스크립트](../scripts/context-bar.sh)를 사용하고 [설정 지침](../scripts/README.md)을 확인하세요.
+
+## Tip 1: Learn a few essential slash commands
+
+내장된 slash command가 많습니다 (`/`를 입력하여 모두 확인). 여기 몇 가지 알아두면 좋은 명령어들이 있습니다:
+
+### /usage
+
+rate limits을 확인하세요:
+
+```
+ Current session
+ █████████▌                                         19% used
+ Resets 12:59am (America/Vancouver)
+
+ Current week (all models)
+ █████████████████████▌                             43% used
+ Resets Feb 3 at 1:59pm (America/Vancouver)
+
+ Current week (Sonnet only)
+ ███████████████████▌                               39% used
+ Resets 8:59am (America/Vancouver)
+```
+
+사용량을 면밀히 모니터링하려면 탭에서 열어두고 Tab 후 Shift+Tab 또는 ← 후 →를 사용하여 새로고침하세요.
+
+### /chrome
+
+Claude의 기본 브라우저 통합을 토글합니다:
+
+```
+> /chrome
+Chrome integration enabled
+```
+
+### /mcp
+
+MCP (Model Context Protocol) 서버를 관리합니다:
+
+```
+ Manage MCP servers
+ 1 server
+
+ ❯ 1. playwright  ✔ connected · Enter to view details
+
+ MCP Config locations (by scope):
+  • User config (available in all your projects):
+    • /Users/yk/.claude.json
+```
+
+### /stats
+
+GitHub 스타일의 활동 그래프로 사용 통계를 확인합니다:
+
+```
+      Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec Jan
+      ··········································▒█░▓░█░▓▒▒
+  Mon ·········································▒▒██▓░█▓█░█
+      ·········································░▒█▒▓░█▒█▒█
+  Wed ········································░▓▒█▓▓░▒▓▒██
+      ········································░▓░█▓▓▓▓█░▒█
+  Fri ········································▒░░▓▒▒█▓▓▓█
+      ········································▒▒░▓░░▓▒▒░░
+
+      Less ░ ▒ ▓ █ More
+
+  Favorite model: Opus 4.5        Total tokens: 17.6m
+
+  Sessions: 4.1k                  Longest session: 20h 40m 45s
+  Active days: 79/80              Longest streak: 75 days
+  Most active day: Jan 26         Current streak: 74 days
+
+  You've used ~24x more tokens than War and Peace
+```
+
+### /clear
+
+대화를 지우고 새로 시작합니다.
+
+## Tip 2: Talk to Claude Code with your voice
+
+음성으로 전달하는 것이 타이핑하는 것보다 훨씬 빠르게 소통할 수 있다는 것을 알게 되었습니다. 로컬 머신에서 음성 전사 시스템을 사용하는 것이 정말 도움이 됩니다.
+
+Mac에서 저는 몇 가지 다른 옵션을 시도했습니다:
+- [superwhisper](https://superwhisper.com/)
+- [MacWhisper](https://goodsnooze.gumroad.com/l/macwhisper)
+- [Super Voice Assistant](https://github.com/ykdojo/super-voice-assistant) (오픈 소스, Parakeet v2/v3 지원)
+
+호스팅 서비스를 사용하면 더 정확할 수 있지만, 이 목적에는 로컬 모델도 충분히 강력하다는 것을 알게 되었습니다. 전사에 실수나 오타가 있어도 Claude는 당신이 말하려는 것을 이해할 만큼 똑똑합니다. 때로는 특정 내용을 더 명확하게 말해야 하지만, 전반적으로 로컬 모델도 충분히 잘 작동합니다.
+
+예를 들어, 이 스크린샷에서 Claude가 "ExcelElanishMark"와 "advast"와 같이 잘못 전사된 단어를 "exclamation mark"와 "Advanced"로 올바르게 해석한 것을 볼 수 있습니다:
+
+![Voice transcription mistakes interpreted correctly](../assets/voice-transcription-mistakes.png)
+
+이것을 생각하는 가장 좋은 방법은 친구와 소통하는 것과 같다는 것입니다. 물론 텍스트로 소통할 수 있습니다. 어떤 사람들에게는 더 쉬울 수 있고, 이메일도 가능합니다. Claude Code를 사용하는 대부분의 사람들이 그렇게 합니다. 하지만 더 빨리 소통하고 싶다면 왜 빠른 전화를 하지 않을까요? 음성 메시지를 보낼 수 있습니다. Claude Code와 문자 그대로 전화를 할 필요는 없습니다. 음성 메시지를 여러 개 보내면 됩니다. 지난 몇 년 동안 말하는 기술을 연습한 사람으로서, 저에게는 더 빠릅니다. 하지만 대부분의 사람들에게도 더 빠를 것이라고 생각합니다.
+
+일반적인 반대 의견은 "다른 사람이 있는 방에서는 어떡하나?"입니다. 저는 이어폰을 사용하고 속삭입니다 - 개인적으로 Apple EarPods(AirPods 아님)를 좋아합니다. 저렴하고, 품질이 충분히 좋으며, 조용히 속삭이면 됩니다. 다른 사람 앞에서도 해봤는데 잘 작동합니다. 사무실에서는 사람들이 어차피 이야기합니다 - 동료와 이야기하는 대신 음성 전사 시스템과 조용히 이야기하는 것입니다. 저는 그것에 문제가 없다고 생각합니다. 이 방법은 너무 잘 작동해서 비행기에서도 작동합니다. 다른 사람이 당신을 듣지 않을 만큼 조용하지만, 마이크에 충분히 가까이 말하면 로컬 모델은 당신이 말하는 내용을 이해할 수 있습니다. (사실 저는 비행기에서 이 방법으로 이 문단을 쓰고 있습니다.)
+
+## Tip 3: Break down large problems into smaller ones
+
+이것은 마스터해야 할 가장 중요한 개념 중 하나입니다. 기존 소프트웨어 엔지니어링과 완전히 동일합니다 - 최고의 소프트웨어 엔지니어들은 이미 이것을 하는 방법을 알고 있으며, Claude Code에도 적용됩니다.
+
+Claude Code가 어려운 문제나 코딩 작업을 한 번에 해결하지 못하는 것 같다면, 여러 개의 작은 문제로 나누도록 요청하세요. 개별 부분을 해결할 수 있는지 확인하세요. 여전히 너무 어렵다면 더 작은 하위 문제를 해결할 수 있는지 확인하세요. 모든 것이 해결 가능할 때까지 계속하세요.
+
+본질적으로, A에서 B로 가는 대신:
+
+![Direct approach](../assets/breakdown-direct.png)
+
+A에서 A1에서 A2에서 A3를 거쳐 B로 갈 수 있습니다:
+
+![Step-by-step approach](../assets/breakdown-steps.png)
+
+이것의 좋은 예는 제가 자신의 음성 전사 시스템을 구축할 때였습니다. 사용자가 모델을 선택하고 다운로드할 수 있게 하고, 키보드 단축키를 받고, 전사를 시작하고, 전사된 텍스트를 사용자의 커서에 놓고, 이 모든 것을 멋진 UI로 래핑하는 시스템을 만들어야 했습니다. 그것은 많은 일입니다. 그래서 저는 더 작은 작업으로 나누었습니다. 먼저 모델을 다운로드하는 실행 파일을 만들었습니다. 그 다음 음성만 녹음하는 것을 만들었습니다. 그 다음 미리 녹음된 오디오만 전사하는 것을 만들었습니다. 저는 마지막에 결합하기 전에 하나씩 완료했습니다.
+
+이것과 매우 관련이 있는 것: 문제 해결 기술과 소프트웨어 엔지니어링 기술은 agentic 코딩과 Claude Code의 세계에서도 여전히 매우 관련이 있습니다. 스스로 많은 문제를 해결할 수 있지만, 일반적인 문제 해결 및 소프트웨어 엔지니어링 기술을 적용하면 훨씬 더 강력해집니다.
+
+## Tip 4: Using Git and GitHub CLI like a pro
+
+Claude에게 Git 및 GitHub CLI 작업을 처리하도록 요청하세요. 여기에는 커밋(커밋 메시지를 수동으로 작성할 필요 없음), 브랜칭, 풀링, 푸싱이 포함됩니다.
+
+저는 개인적으로 pull은 자동으로 허용하지만 push는 그렇지 않습니다. 왜냐하면 push가 더 위험하기 때문입니다 - pull에 문제가 생겨도 origin이 오염되지 않습니다.
+
+GitHub CLI(`gh`)의 경우 할 수 있는 것이 많습니다. Claude Code를 사용한 후 제가 더 많이 하기 시작한 것 한 가지는 draft PR을 만드는 것입니다. 이렇게 하면 Claude Code가 낮은 위험으로 PR 생성 프로세스를 처리할 수 있습니다 - 검토할 준비가 되었다고 표시하기 전에 모든 것을 검토할 수 있습니다.
+
+그리고 `gh`는 꽤 강력합니다. GraphQL 쿼리까지 보낼 수 있습니다. 예를 들어, GitHub PR 설명이 편집된 정확한 시간까지 찾을 수 있습니다:
+
+```
+⏺ Bash(gh api graphql -f query='
+      query {
+        repository(owner: "...", name: "...") {
+          pullRequest(number: ...) {
+            userContentEdits(first: 100) {
+              nodes { editedAt editor { login } }
+            }
+          }
+        }
+      }')
+
+⏺ Here's the full edit history for your PR description:
+
+  | #  | Edited At (UTC)     | Editor |
+  |----|---------------------|--------|
+  | 1  | 2025-12-01 00:08:34 | ykdojo |
+  | 2  | 2025-12-01 15:57:21 | ykdojo |
+  | 3  | 2025-12-01 16:24:33 | ykdojo |
+  | 4  | 2025-12-01 16:27:00 | ykdojo |
+  | 5  | 2025-12-04 00:40:02 | ykdojo |
+  ...
+```
+
+### Disable commit/PR attribution
+
+기본적으로 Claude Code는 커밋에 `Co-Authored-By` 트레일러를 추가하고 PR에 attribution footer를 추가합니다. `~/.claude/settings.json`에 이것을 추가하여 둘 다 비활성화할 수 있습니다:
+
+```json
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
+}
+```
+
+둘 다 빈 문자열로 설정하면 attribution이 완전히 제거됩니다. 이것은 이제 deprecated된 오래된 `includeCoAuthoredBy` 설정을 대체합니다.
+
+## Tip 5: AI context is like milk; it's best served fresh and condensed!
+
+Claude Code로 새 대화를 시작하면 대화의 이전 부분에서 이전 컨텍스트를 처리해야 하는 추가 복잡성이 없기 때문에 최고의 성능을 발휘합니다. 하지만 더 오래 이야기할수록 컨텍스트가 길어지고 성능이 저하되는 경향이 있습니다.
+
+따라서 모든 새 주제에 대해 새 대화를 시작하거나 성능이 저하되기 시작하면 새 대화를 시작하는 것이 가장 좋습니다.
+
+## Tip 6: Getting output out of your terminal
+
+때로는 Claude Code의 출력을 복사하여 붙여넣고 싶지만, 터미널에서 직접 복사하는 것이 항상 깨끗하지는 않습니다. 콘텐츠를 더 쉽게 가져오는 몇 가지 방법이 있습니다:
+
+- **`/copy` command**: 가장 간단한 옵션 - `/copy`를 입력하여 Claude의 마지막 응답을 markdown으로 클립보드에 복사
+- **Clipboard directly**: Mac 또는 Linux에서 Claude에게 `pbcopy`를 사용하도록 요청하여 출력을 바로 클립보드로 보낼 수 있습니다
+- **Write to a file**: Claude에게 콘텐츠를 파일에 넣도록 한 다음 VS Code(또는 좋아하는 에디터)에서 열도록 요청하여 거기서 복사할 수 있습니다. 줄 번호를 지정할 수도 있으므로 Claude가 방금 편집한 특정 줄을 열도록 요청할 수 있습니다. Markdown 파일의 경우 VS Code에서 열리면 Cmd+Shift+P(Linux/Windows에서는 Ctrl+Shift+P)를 사용하고 "Markdown: Open Preview"를 선택하여 렌더링된 버전을 볼 수 있습니다
+- **Opening URLs**: 직접 확인하려는 URL이 있는 경우 Claude에게 브라우저에서 열도록 요청하세요. Mac에서는 `open` 명령을 사용하도록 요청할 수 있지만, 일반적으로 좋아하는 브라우저에서 열도록 요청하면 모든 플랫폼에서 작동해야 합니다
+- **GitHub Desktop**: Claude에게 현재 repo를 GitHub Desktop에서 열도록 요청할 수 있습니다. 이것은 비루트 디렉토리에서 작업할 때 특히 유용합니다 - 예를 들어 다른 디렉토리에 git worktree를 만들도록 요청했고 아직 거기서 Claude Code를 열지 않은 경우
+
+이 중 일부를 결합할 수도 있습니다. 예를 들어, GitHub PR 설명을 편집하려는 경우 Claude가 직접 편집하게 하는 대신(실수를 할 수 있음), 먼저 콘텐츠를 로컬 파일에 복사하도록 할 수 있습니다. 그것이 편집하게 하고, 결과를 직접 확인한 다음, 좋아 보이면 Claude가 복사하여 GitHub PR에 다시 붙여넣도록 합니다. 이것은 정말 잘 작동합니다. 또는 직접 수행하려는 경우 VS Code에서 열도록 요청하거나 pbcopy를 통해 제공하도록 요청하여 수동으로 복사하여 붙여넣을 수 있습니다.
+
+물론 이 명령어들을 직접 실행할 수 있지만, 반복적으로 수행하고 있다는 것을 발견하면 Claude가 실행하도록 하는 것이 도움이 됩니다.
+
+## Tip 7: Set up terminal aliases for quick access
+
+Claude Code 때문에 터미널을 더 사용하게 되어 빠르게 시작할 수 있도록 짧은 별칭을 설정하는 것이 도움이 된다는 것을 알게 되었습니다. 여기 제가 사용하는 것들이 있습니다:
+
+- `c` for Claude Code (제가 가장 많이 사용하는 것입니다)
+- `ch` for Claude Code with Chrome integration
+- `gb` for GitHub Desktop
+- `co` for VS Code
+- `q`: 대부분의 프로젝트가 있는 프로젝트 디렉토리로 이동합니다. 그 다음 개별 프로젝트 폴더로 이동하거나, `c`를 실행하여 Claude Code에서 해당 폴더의 모든 프로젝트에 기본적으로 접근할 수 있습니다.
+
+이것들을 설정하려면 셸 설정 파일(`~/.zshrc` 또는 `~/.bashrc`)에 다음과 같은 줄을 추가하세요:
+
+```bash
+alias c='claude'
+alias ch='claude --chrome'
+alias gb='github'
+alias co='code'
+alias q='cd ~/Desktop/projects'
+```
+
+이 별칭들이 있으면 플래그와 결합할 수 있습니다: `c -c`는 마지막 대화를 계속하고, `c -r`은 재개할 최근 대화 목록을 표시합니다. 이것은 Chrome 세션용 `ch`에서도 작동합니다(`ch -c`, `ch -r`).
+
+## Tip 8: Proactively compact your context
+
+Claude Code에는 대화를 요약하여 컨텍스트 공간을 확보하는 `/compact` 명령이 있습니다. 사용 가능한 전체 컨텍스트가 채워지면 자동 압축도 발생합니다. Opus 4.5의 총 사용 가능한 컨텍스트 창은 현재 200k이며, 그중 45k는 자동 압축을 위해 예약되어 있습니다. 전체 200k의 약 10%가 시스템 프롬프트, 도구, 메모리, 동적 컨텍스트로 자동 채워집니다. 하지만 저는 적극적으로 수동으로 조정하는 것이 더 좋다는 것을 알게 되었습니다. `/config`로 auto-compact를 껐습니다. 주요 대화에 더 많은 컨텍스트를 사용할 수 있고 언제 어떻게 압축이 발생하는지 더 많은 제어를 할 수 있기 때문입니다.
+
+제가 이것을 하는 방법은 새로 시작하기 전에 Claude에게 handoff 문서를 작성하도록 요청하는 것입니다. 다음과 같이:
+
+> Put the rest of the plan in the system-prompt-extraction folder as HANDOFF.md. Explain what you have tried, what worked, what didn't work, so that the next agent with fresh context is able to just load that file and nothing else to get started on this task and finish it up.
+
+Claude는 작업의 현재 상태를 요약하는 파일을 만듭니다:
+
+```
+⏺ Write(experiments/system-prompt-extraction/HANDOFF.md)
+  ⎿  Wrote 129 lines to experiments/system-prompt-extraction/HANDOFF.md
+     # System Prompt Slimming - Handoff Document
+     ## Goal
+     Reduce Claude Code's system prompt by ~45% (currently at 11%, need ~34% more).
+     ## Current Progress
+     ### What's Been Done
+     - **Backup/restore system**: `backup-cli.sh` and `restore-cli.sh` with SHA256 verification
+     - **Patch system**: `patch-cli.js` that restores from backup then applies patches
+     ...
+```
+
+Claude가 작성한 후 빠르게 검토하세요. 누락된 것이 있으면 편집을 요청하세요:
+
+> Did you add a note about iteratively testing instead of trying to do everything all at once?
+
+그런 다음 새 대화를 시작하세요. 새 agent의 경우 파일 경로만 주고 다른 것은 없이 작동해야 합니다:
+
+```
+> experiments/system-prompt-extraction/HANDOFF.md
+```
+
+후속 대화에서 agent에게 다음 agent를 위해 문서를 업데이트하도록 요청할 수 있습니다.
+
+또한 이것을 자동화하는 `/handoff` slash command를 만들었습니다 - 기존 HANDOFF.md를 확인하고, 있으면 읽은 다음 목표, 진행 상황, 작동한 것, 작동하지 않은 것, 다음 단계로 생성하거나 업데이트합니다. [skills folder](../skills/handoff/SKILL.md)에서 찾을 수 있거나 [dx plugin](#tip-44-install-the-dx-plugin)을 통해 설치할 수 있습니다.
+
+**Alternative: Use plan mode**
+
+또 다른 옵션은 plan mode를 사용하는 것입니다. `/plan` 또는 Shift+Tab으로 입력하세요. Claude에게 다음 agent를 위해 모든 관련 컨텍스트를 수집하고 포괄적인 계획을 만들도록 요청하세요:
+
+> I just enabled plan mode. Bring over all of the context that you need for the next agent. The next agent will not have any other context, so you'll need to be pretty comprehensive.
+
+Claude는 코드베이스를 탐색하고, 컨텍스트를 수집하고, 자세한 계획을 작성합니다. 완료되면 다음과 같은 옵션이 표시됩니다:
+
+```
+Would you like to proceed?
+
+❯ 1. Yes, clear context and auto-accept edits (shift+tab)
+  2. Yes, auto-accept edits
+  3. Yes, manually approve edits
+  4. Type here to tell Claude what to change
+```
+
+옵션 1은 이전 컨텍스트를 지우고 계획으로 새로 시작합니다. 새 Claude 인스턴스는 계획만 보므로 오래된 대화의 짐 없이 집중할 수 있습니다. 또한 특정 세부 정보를 조회해야 하는 경우 오래된 전사 기록 파일에 대한 링크도 받습니다.
+
+## Tip 9: Complete the write-test cycle for autonomous tasks
+
+Claude Code가 `git bisect`와 같은 것을 자율적으로 실행하도록 하려면 결과를 검증할 방법을 제공해야 합니다. 핵심은 작성-테스트 주기를 완료하는 것입니다: 코드를 작성하고, 실행하고, 출력을 확인하고, 반복합니다.
+
+예를 들어, Claude Code 자체에서 작업 중이고 `/compact`가 작동을 멈추고 400 오류를 throw하기 시작한 것을 발견했다고 가정해 보세요. 이것을 caused한 정확한 커밋을 찾는 고전적인 도구는 `git bisect`입니다. 좋은 점은 Claude Code가 스스로 bisect를 실행하도록 할 수 있지만 각 커밋을 테스트할 방법이 필요합니다.
+
+Claude Code와 같은 대화형 터미널이 포함된 작업의 경우 tmux를 사용할 수 있습니다. 패턴은 다음과 같습니다:
+
+1. tmux 세션 시작
+2. 명령 보내기
+3. 출력 캡처
+4. 예상한 것인지 확인
+
+다음은 `/context`가 작동하는지 테스트하는 간단한 예입니다:
+
+```bash
+tmux kill-session -t test-session 2>/dev/null
+tmux new-session -d -s test-session
+tmux send-keys -t test-session 'claude' Enter
+sleep 2
+tmux send-keys -t test-session '/context' Enter
+sleep 1
+tmux capture-pane -t test-session -p
+```
+
+이와 같은 테스트가 있으면 Claude Code는 `git bisect`를 실행하고 문제를 일으킨 커밋을 찾을 때까지 각 커밋을 자동으로 테스트할 수 있습니다.
+
+이것은 소프트웨어 엔지니어링 기술이 여전히 중요한 이유의 예이기도 합니다. 소프트웨어 엔지니어라면 `git bisect`와 같은 도구에 대해 알고 있을 것입니다. 그 지식은 AI로 작업할 때도 여전히 정말 가치 있습니다 - 새로운 방식으로 적용할 뿐입니다.
+
+또 다른 예는 간단히 테스트를 작성하는 것입니다. Claude Code가 코드를 작성하도록 한 후 테스트하려면 자신을 위해 테스트도 작성하도록 할 수 있습니다. 그리고 스스로 실행하도록 하고 수정할 수 있다면 수정하게 하세요. 물론 항상 올바른 방향으로 가지는 않고 때로는 감독해야 하지만, 놀랍게도 많은 코딩 작업을 스스로 할 수 있습니다.
+
+### Creative testing strategies
+
+때로는 작성-테스트 주기를 완료하는 방법에서 창의적이어야 합니다. 예를 들어, 웹 앱을 구축하는 경우 Playwright MCP, Chrome DevTools MCP 또는 Claude의 기본 브라우저 통합(`/chrome` 통해)을 사용할 수 있습니다. Chrome DevTools는 아직 시도하지 않았지만 Playwright와 Claude의 기본 통합은 시도했습니다. 전반적으로 Playwright가 일반적으로 더 잘 작동합니다. 많은 컨텍스트를 사용하지만 200k 컨텍스트 창은 일반적으로 단일 작업 또는 몇 개의 작은 작업에 충분합니다.
+
+이 두 가지의 주요 차이점은 Playwright가 스크린샷을 찍는 대신 접근성 트리(페이지 요소에 대한 구조화된 데이터)에 중점을 둔다는 것입니다. 스크린샷을 찍을 수 있는 기능이 있지만 일반적으로 작업을 수행하기 위해 사용하지 않습니다. 반면에 Claude의 기본 브라우저 통합은 특정 좌표로 요소를 클릭하는 데 더 중점을 둡니다. 때로는 무작위 것들을 클릭할 수 있고 전체 프로세스가 느릴 수 있습니다.
+
+이것은 시간이 지남에 따라 개선될 수 있지만 기본적으로 시각적으로 집중되지 않은 대부분의 작업에는 Playwright를 선택할 것입니다. 로그인된 상태를 사용해야 하는데 자격 증명을 제공하지 않으려는 경우(자체 브라우저 프로필에서 실행되므로) 또는 좌표를 사용하여 시각적으로 특정 것들을 클릭해야 하는 경우에만 Claude의 기본 브라우저 통합을 사용할 것입니다.
+
+이것이 제가 기본적으로 Claude의 기본 브라우저 통합을 비활성화하고 이전에 정의한 `ch` 바로 가기를 통해 사용하는 이유입니다. 그렇게 하면 Playwright가 대부분의 브라우저 작업을 처리하고 특별히 필요할 때만 Claude의 기본 통합을 활성화합니다.
+
+또한 좌표 대신 접근성 트리 ref를 사용하도록 요청할 수 있습니다. 제가 이것을 위해 CLAUDE.md에 넣은 것은 다음과 같습니다:
+
+```markdown
+# Claude for Chrome
+
+- Use `read_page` to get element refs from the accessibility tree
+- Use `find` to locate elements by description
+- Click/interact using `ref`, not coordinates
+- NEVER take screenshots unless explicitly requested by the user
+```
+
+개인적인 경험에서, Python 라이브러리([Daft](https://github.com/Eventual-Inc/Daft))에서 작업하고 있었고 Google Colab에서 로컬로 구축한 버전을 테스트해야 하는 상황도 있었습니다. 문제는 Google Colab에서 Rust 백엔드로 Python 라이브러리를 구축하기 어렵다는 것입니다 - 잘 작동하지 않는 것 같습니다. 그래서 실제로 로컬로 wheel을 구축한 다음 수동으로 업로드하여 Google Colab에서 실행할 수 있어야 했습니다. 또한 monkey patching도 시도했는데, 전체 wheel을 로컬로 구축할 때까지 기다려야 하는 단기적으로 잘 작동했습니다. 저는 이러한 테스트 전략을 생각해 냈고 Claude Code와 왕복하면서 실행했습니다.
+
+또 다른 상황은 Windows에서 무언가를 테스트해야 하는데 Windows 머신을 실행하지 않는다는 것입니다. 같은 repo의 CI 테스트가 Windows에서 Rust 문제로 실패하고 있어 로컬로 테스트할 방법이 없었습니다. 따라서 모든 변경 사항으로 draft PR을 만들고 동일한 변경 사항과 비주요 브랜치에서 Windows CI 실행을 활성화한 또 다른 draft PR을 만들어야 했습니다. Claude Code에게 모든 것을 수행하도록 지시했고 새 브랜치에서 CI를 직접 테스트했습니다.
+
+## Tip 10: Cmd+A and Ctrl+A are your friends
+
+몇 년 동안 이 말을 해왔습니다: Cmd+A와 Ctrl+A는 AI 세계의 친구입니다. 이것은 Claude Code에도 적용됩니다.
+
+때로는 Claude Code에 URL을 주고 싶지만 직접 액세스할 수 없는 경우가 있습니다. 비공개 페이지(민감한 데이터는 아니지만 공개적으로 액세스할 수 없음) 또는 Claude Code가 가져오는 데 문제가 있는 Reddit 게시물과 같은 것일 수 있습니다. 그러한 경우 보는 모든 내용을 선택(Mac에서는 Cmd+A, 다른 플랫폼에서는 Ctrl+A)하고 복사하여 Claude Code에 직접 붙여넣을 수 있습니다. 꽤 강력한 방법입니다.
+
+이것은 터미널 출력에도 효과적입니다. Claude Code 자체 또는 다른 CLI 응용 프로그램의 출력이 있는 경우 같은 트릭을 사용할 수 있습니다: 모두 선택, 복사, CC에 다시 붙여넣기. 꽤 도움이 됩니다.
+
+일부 페이지는 기본적으로 모두 선택하기에 적합하지 않지만 - 먼저 더 나은 상태로 만드는 트릭이 있습니다. 예를 들어, Gmail 스레드의 경우 Print All을 클릭하여 인쇄 미리보기를 가져옵니다(실제 인쇄는 취소). 해당 페이지는 스레드의 모든 이메일이 확장되어 표시하므로 전체 대화를 깔끔하게 Cmd+A할 수 있습니다.
+
+이것은 Claude Code뿐만 아니라 모든 AI에 적용됩니다.
+
+## Tip 11: Use Gemini CLI as a fallback for blocked sites
+
+Claude Code의 WebFetch 도구는 Reddit과 같은 특정 사이트에 액세스할 수 없습니다. 하지만 Claude에게 Gemini CLI를 대안으로 사용하도록 지시하는 skill을 만들어 이것을 우회할 수 있습니다. Gemini는 웹 액세스를 가지고 있으며 Claude가 직접 도달할 수 없는 사이트에서 콘텐츠를 가져올 수 있습니다.
+
+이것은 Tip 9의 동일한 tmux 패턴을 사용합니다 - 세션 시작, 명령 전송, 출력 캡처. skill 파일은 `~/.claude/skills/reddit-fetch/SKILL.md`에 들어갑니다. 전체 내용은 [skills/reddit-fetch/SKILL.md](../skills/reddit-fetch/SKILL.md)를 참조하세요.
+
+Skills는 필요할 때만 로드되므로 더 토큰 효율적입니다. 더 간단한 것이 필요하면 `~/.claude/CLAUDE.md`에 압축된 버전을 넣을 수 있지만, 필요하지 않아도 모든 대화에 로드됩니다.
+
+저는 Claude Code에게 Reddit에서 Claude Code skills가 어떻게 간주되는지 확인하도록 요청하여 이것을 테스트했습니다 - 약간 메타입니다. 잠시 동안 Gemini와 왕복하므로 빠르지 않지만 보고서 품질은 놀랍게도 좋았습니다. 당연히 이것이 작동하려면 Gemini CLI가 설치되어 있어야 합니다. 또한 [dx plugin](#tip-44-install-the-dx-plugin)을 통해 이 skill을 설치할 수 있습니다.
+
+## Tip 12: Invest in your own workflow
+
+개인적으로 저는 Swift로 처음부터 자신의 음성 전사 앱을 만들었습니다. Claude Code를 사용하여 bash로 처음부터 자신의 커스텀 상태 표시줄을 만들었습니다. 그리고 Claude Code의 축소된 JavaScript 파일에서 시스템 프롬프트를 단순화하는 자신만의 시스템을 만들었습니다.
+
+하지만 그렇게 과도하게 할 필요는 없습니다. CLAUDE.md를 돌보는 것, 목표를 달성하는 데 도움이 될 수 있으면서 가능한 한 간결하게 만드는 것 - 그런 것들이 도움이 됩니다. 그리고 물론 이러한 팁을 배우고, 이러한 도구를 배우고, 가장 중요한 일부 기능을 배우는 것.
+
+이것들은 당신이 무엇이든 구축하는 데 사용하는 도구에 대한 투자입니다. 적어도 약간의 시간을 그것에 쓰는 것이 중요하다고 생각합니다.
+
+## Tip 13: Search through your conversation history
+
+Claude Code에게 과거 대화에 대해 물어볼 수 있으며 찾고 검색하는 데 도움이 됩니다. 대화 기록은 `~/.claude/projects/`에 로컬로 저장되며 폴더 이름은 프로젝트 경로를 기반으로 합니다(슬래시는 대시가 됨).
+
+예를 들어, `/Users/yk/Desktop/projects/claude-code-tips`에 있는 프로젝트의 대화는 다음에 저장됩니다:
+
+```
+~/.claude/projects/-Users-yk-Desktop-projects-claude-code-tips/
+```
+
+각 대화는 `.jsonl` 파일입니다. 기본 bash 명령으로 검색할 수 있습니다:
+
+```bash
+# Find all conversations mentioning "Reddit"
+grep -l -i "reddit" ~/.claude/projects/-Users-yk-Desktop-projects-*/*.jsonl
+
+# Find today's conversations about a topic
+find ~/.claude/projects/-Users-yk-Desktop-projects-*/*.jsonl -mtime 0 -exec grep -l -i "keyword" {} \;
+
+# Extract just the user messages from a conversation (requires jq)
+cat ~/.claude/projects/.../conversation-id.jsonl | jq -r 'select(.type=="user") | .message.content'
+```
+
+또는 Claude Code에 직접 물어보세요: "What did we talk about regarding X today?" 그러면 기록을 검색해 줍니다.
+
+## Tip 14: Multitasking with terminal tabs
+
+여러 Claude Code 인스턴스를 실행할 때 Git worktrees와 같은 특정 기술 설정보다 체계적으로 유지하는 것이 더 중요합니다. 한 번에 최대 3~4개 작업에 중점을 두는 것이 좋습니다.
+
+저의 개인적인 방법은 "캐스케이드"라고 부르는 것입니다 - 새 작업을 시작할 때마다 오른쪽에 새 탭을 엽니다. 그런 다음 왼쪽에서 오른쪽으로, 왼쪽에서 오른쪽으로 쓸어서 가장 오래된 작업에서 최신 작업으로 이동합니다. 특정 작업을 확인해야 하거나 알림을 받아야 할 때를 제외하고 일반적인 방향은 일관되게 유지됩니다.
+
+제 설정이 일반적으로 어떻게 보이는지는 다음과 같습니다:
+
+![Terminal tabs showing multitasking workflow](../assets/multitasking-terminal-tabs.png)
+
+이 예에서:
+1. **왼쪽 탭** - 음성 전사 시스템을 실행하는 지속적인 탭(항상 여기에 유지)
+2. **두 번째 탭** - Docker 컨테이너 설정
+3. **세 번째 탭** - 로컬 머신의 디스크 사용량 확인
+4. **네 번째 탭** - 엔지니어링 프로젝트 작업
+5. **다섯 번째 탭(현재)** - 이 팁 작성
+
+## Tip 15: Slim down the system prompt
+
+Claude Code의 시스템 프롬프트와 도구 정의는 작업을 시작하기도 전에 약 19k 토큰(200k 컨텍스트의 약 10%)을 차지합니다. 저는 이것을 약 9k 토큰으로 줄이는 패치 시스템을 만들었습니다 - 약 10,000 토큰(오버헤드의 ~50%)을 절약합니다.
+
+| Component | Before | After | Savings |
+|-----------|--------|-------|---------|
+| System prompt | 3.0k | 1.8k | 1,200 tokens |
+| System tools | 15.6k | 7.4k | 8,200 tokens |
+| **Total** | **~19k** | **~9k** | **~10k tokens (~50%)** |
+
+패치 전후의 `/context` 모습은 다음과 같습니다:
+
+**Unpatched (~20k, 10%)**
+
+![Unpatched context](../assets/context-unpatched.png)
+
+**Patched (~10k, 5%)**
+
+![Patched context](../assets/context-patched.png)
+
+패치는 필수적인 지침을 유지하면서 축소된 CLI 번들에서 장황한 예와 중복 텍스트를 잘라내어 작동합니다.
+
+저는 이것을 광범위하게 테스트했으며 잘 작동합니다. 더 원시적 느낌 - 더 강력하지만 약간 덜 규제되는 것 같습니다. 시스템 지침이 더 짧기 때문입니다. 이렇게 사용하면 더 전문적인 도구 느낌이 듭니다. 더 낮은 컨텍스트로 시작하는 것을 정말 좋아합니다. 채워지기 전에 더 많은 공간이 있어 대화를 조금 더 계속할 수 있는 옵션이 있기 때문입니다. 이것이 확실히 이 전략의 가장 좋은 부분입니다.
+
+패치 스크립트와 잘리는 것에 대한 전체 세부 정보는 [system-prompt folder](../system-prompt/)를 확인하세요.
+
+**Why patching?** Claude Code에는 파일에서 단순화된 시스템 프롬프트를 제공하는 플래그(`--system-prompt` 또는 `--system-prompt-file`)가 있으므로 그것이 또 다른 방법입니다. 하지만 도구 설명의 경우 사용자 지정할 수 있는 공식 옵션이 없습니다. CLI 번들을 패치하는 것이 유일한 방법입니다. 내 패치 시스템은 모든 것을 하나의 통합된 접근 방식으로 처리하므로 지금은 이렇게 유지하고 있습니다. 나중에 플래그를 사용하여 시스템 프롬프트 부분을 다시 구현할 수 있습니다.
+
+**Supported installations:** npm and native binary (macOS and Linux).
+
+**Important**: 패치된 시스템 프롬프트를 유지하려면 `~/.claude/settings.json`에 이것을 추가하여 auto-updates를 비활성화하세요:
+
+```json
+{
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+  }
+}
+```
