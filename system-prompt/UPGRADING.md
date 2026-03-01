@@ -456,7 +456,7 @@ Test all three build types: npm, native-linux, native-macos.
 **Per-build checklist:**
 | Test | npm | Linux native | macOS native |
 |------|-----|--------------|--------------|
-| Patches apply 63/63 | [ ] | [ ] | [ ] |
+| Patches apply 58/58 | [ ] | [ ] | [ ] |
 | `/context` works | [ ] | [ ] | [ ] |
 | Corruption test | [ ] | [ ] | [ ] |
 | Self-report test | [ ] | [ ] | [ ] |
