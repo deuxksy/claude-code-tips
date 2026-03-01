@@ -501,3 +501,269 @@ Claude Code의 시스템 프롬프트와 도구 정의는 작업을 시작하기
   }
 }
 ```
+
+이것은 shell 타입(interactive, non-interactive, tmux)에 관계없이 모든 Claude Code 세션에 적용됩니다. 나중에 새 버전에 패치를 다시 적용할 준비가 되면 수동으로 업데이트할 수 있습니다.
+
+### MCP 도구 지연 로드
+
+MCP 서버를 사용하는 경우 기본적으로 모든 대화에 도구 정의가 로드됩니다 - 사용하지 않더라도 마찬가지입니다. 특히 여러 서버가 구성된 경우 상당한 오버헤드가 추가될 수 있습니다.
+
+필요할 때만 MCP 도구가 로드되도록 lazy-loading을 활성화하세요:
+
+```json
+{
+  "env": {
+    "ENABLE_TOOL_SEARCH": "true"
+  }
+}
+```
+
+이것을 `~/.claude/settings.json`에 추가하세요. Claude는 필요할 때 MCP 도구를 검색하고 로드하며 처음부터 모든 것이 있도록 하지 않습니다. 버전 2.1.7부터 MCP 도구 설명이 컨텍스트 창의 10%를 초과하면 자동으로 발생합니다.
+
+## Tip 16: Git worktrees for parallel branch work
+
+동일한 프로젝트에서 동시에 여러 작업을 수행하고 있고 충돌이 발생하지 않게 하려면 Git worktrees가 좋은 방법입니다. git worktree를 만들도록 Claude Code에 요청하고 거기서 작업을 시작할 수 있습니다 - 특정 문법을 걱정할 필요가 없습니다.
+
+기본 아이디어는 다른 디렉토리에서 다른 브랜치에서 작업할 수 있다는 것입니다. 본질적으로 브랜치 + 디렉토리입니다.
+
+멀티태스킹 팁에서 논의한 캐스케이드 방법 위에 이 Git worktrees 레이어를 추가할 수 있습니다.
+
+### Git worktrees란 무엇인가요?
+
+Git worktree는 다른 git 브랜치와 같지만 새로운 디렉토리가 특별히 할당되어 있습니다.
+
+예를 들어 main 브랜치와 feature-branch-1에서 작업 중이라면 git worktrees가 없으면 프로젝트 폴더가 한 번에 하나의 브랜치에만 설정될 수 있으므로 한 번에 하나만 작업할 수 있습니다.
+
+하지만 git worktree를 사용하면 원래 프로젝트 폴더에서 main 브랜치(또는 다른 브랜치)에서 계속 작업하면서 동시에 새 폴더에서 feature-branch-1에서 작업할 수 있습니다.
+
+![별도 디렉토리에서 병렬 브랜치 작업을 보여주는 Git worktrees 다이어그램](../assets/git-worktrees.png)
+
+## Tip 17: Manual exponential backoff for long-running jobs
+
+Docker 빌드 또는 GitHub CI와 같은 오래 실행되는 작업을 기다릴 때 Claude Code에 수동 exponential backoff를 수행하도록 요청할 수 있습니다. Exponential backoff는 소프트웨어 엔지니어링의 일반적인 기술이지만 여기서도 적용할 수 있습니다. 점차 길어지는 sleep 간격으로 상태를 확인하도록 Claude Code에 요청하세요 - 1분, 그 다음 2분, 그 다음 4분 등입니다. 전통적인 의미에서 프로그래밍 방식으로 수행하는 것은 아닙니다 - AI가 수동으로 수행합니다 - 하지만 꽤 잘 작동합니다.
+
+이 방법으로 agent는 지속적으로 상태를 확인하고 완료되면 알려줄 수 있습니다.
+
+(GitHub CI의 경우 특히 `gh run watch`가 있지만 지속적으로 많은 줄을 출력하므로 토큰을 낭비합니다. `gh run view <run-id> | grep <job-name>`을 통한 수동 exponential backoff가 실제로 더 토큰 효율적입니다. 이것은 또한 전용 대기 명령이 없을 때도 잘 작동하는 일반적인 기술입니다.)
+
+예를 들어, 백그라운드에서 Docker 빌드를 실행 중인 경우:
+
+![Docker 빌드 진행 상황을 확인하는 수동 exponential backoff](../assets/manual-exponential-backoff.png)
+
+그리고 작업이 완료될 때까지 계속 진행됩니다.
+
+## Tip 18: Claude Code as a writing assistant
+
+Claude Code는 훌륭한 작성 도우미이자 파트너입니다. 제가 작성을 위해 사용하는 방법은 먼저 작성하려는 것에 대한 모든 컨텍스트를 제공한 다음 음성을 사용하여 말로 자세한 지침을 제공합니다. 그러면 첫 번째 초안이 나옵니다. 충분히 좋지 않으면 몇 번 시도합니다.
+
+그런 다음 줄별로 거의 다 살펴봅니다. 좋아요, 같이 살펴봅시다라고 말합니다. 저는 이런 이유로 이 줄을 좋아합니다. 이 줄은 저기로 이동해야 한다고 느낍니다. 이 줄은 이 특정한 방식으로 변경되어야 합니다. 참고 자료에 대해서도 물어볼 수 있습니다.
+
+그래서 이런 종류의 왕복 프로세스인데, 아마 왼쪽에 터미널이 있고 오른쪽에 코드 에디터가 있을 것입니다:
+
+![Claude Code와 함께하는 나란한 작성 워크플로우](../assets/writing-assistant-side-by-side.png)
+
+이것은 정말 잘 작동합니다.
+
+## Tip 19: Markdown is the s**t
+
+일반적으로 사람들이 새 문서를 작성할 때 Google Docs나 Notion과 같은 것을 사용할 수 있습니다. 하지만 이제는 솔직하게 markdown이 가장 효율적인 방법이라고 생각합니다.
+
+AI가 등장하기 전에도 markdown은 꽤 좋았지만 특히 Claude Code의 경우 작성과 관련하여 언급한 것처럼 매우 효율적이므로 markdown의 가치가 더 높아졌다고 생각합니다. 블로그 게시물 또는 LinkedIn 게시물을 작성하려는 경우 언제든지 Claude Code와 대화하고 markdown으로 저장한 다음 거기서 진행할 수 있습니다.
+
+이것에 대한 빠른 팁: markdown 콘텐츠를 쉽게 받아들이지 않는 플랫폼에 복사하여 붙여넣으려는 경우 먼저 새 Notion 파일에 붙여넣은 다음 Notion에서 다른 플랫폼으로 복사할 수 있습니다. Notion은 다른 플랫폼이 받아들일 수 있는 형식으로 변환합니다. 일반 붙여넣기가 작동하지 않으면 Command + Shift + V를 사용하여 서식 없이 붙여넣으세요.
+
+## Tip 20: Use Notion to preserve links when pasting
+
+반대로도 작동한다는 것이 밝혀졌습니다. 다른 곳(예: Slack)에서 링크가 있는 텍스트가 있는 경우 복사할 수 있습니다. Claude Code에 직접 붙여넣으면 링크가 표시되지 않습니다. 하지만 먼저 Notion 문서에 넣은 다음 거기서 복사하면 markdown으로 얻을 수 있으며 물론 Claude Code가 읽을 수 있습니다.
+
+## Tip 21: Containers for long-running risky tasks
+
+일반 세션은 부여하는 권한을 제어하고 출력을 더 신중하게 검토하는 체계적인 작업을 위한 것입니다. 컨테이너화된 환경은 작은 것마다 권한을 부여할 필요가 없는 `--dangerously-skip-permissions` 세션에 적합합니다. 당분간 스스로 실행하도록 둘 수 있습니다.
+
+이것은 오래 걸리고 위험할 수 있는 연구나 실험에 유용합니다. 좋은 예는 Tip 11의 Reddit 연구 워크플로우입니다. 여기서 reddit-fetch skill은 tmux를 통해 Gemini CLI와 왕복합니다. 주 시스템에서 감독 없이 실행하는 것은 위험하지만 컨테이너에서는 문제가 발생해도 포함됩니다.
+
+또 다른 예는 제가 이 저장소에서 [system prompt patching scripts](../system-prompt/)를 만든 방법입니다. Claude Code의 새 버전이 나올 때 minified CLI 번들에 대한 패치를 업데이트해야 합니다. 호스트 머신(모든 것에 액세스하는 곳)에서 `--dangerously-skip-permissions`로 Claude Code를 실행하는 대신 컨테이너에서 실행합니다. Claude Code는 minified JavaScript를 탐색하고 변수 매핑을 찾고 모든 작은 것을 승인하지 않고 새 패치 파일을 만들 수 있습니다.
+
+사실 그것은 거의 자체적으로 마이그레이션을 완료할 수 있었습니다. 패치를 적용하려고 시도하고 일부가 새 버전에서 작동하지 않는다는 것을 발견하고 수정하기 위해 반복하고 배운 내용을 바탕으로 향후 인스턴스를 위해 [instruction document](../system-prompt/UPGRADING.md)를 개선했습니다.
+
+사실 저는 컨테이너화된 Claude Code 세션을 쉽게 실행하기 위해 [SafeClaw](https://github.com/ykdojo/safeclaw)를 만들었습니다. 여러 개의 격리된 세션을 시작하고 각각 웹 터미널을 가지며 대시보드에서 모두 관리할 수 있습니다. 이 저장소의 여러 사용자 정의를 사용합니다. 최적화된 시스템 프롬프트, [DX plugin](#tip-44-install-the-dx-plugin), [status line](#tip-0-customize-your-status-line)을 포함합니다.
+
+### Advanced: 컨테이너에서 worker Claude Code 오케스트레이션
+
+로컬 Claude Code가 컨테이너 내에서 실행 중인 다른 Claude Code 인스턴스를 제어하도록 하여 이것을 더 발전시킬 수 있습니다. 요령은 tmux를 제어 레이어로 사용하는 것입니다:
+
+1. 로컬 Claude Code가 tmux 세션을 시작합니다
+2. 해당 tmux 세션에서 컨테이너를 실행하거나 연결합니다
+3. 컨테이너 내부에서 Claude Code가 `--dangerously-skip-permissions`로 실행됩니다
+4. 외부 Claude Code는 `tmux send-keys`를 사용하여 프롬프트를 보내고 `capture-pane`을 사용하여 출력을 읽습니다
+
+이것은 완전히 자율적인 "worker" Claude Code를 제공하여 모든 작업을 승인하지 않고 실험적이거나 오래 실행되는 작업을 실행할 수 있습니다. 완료되면 로컬 Claude Code가 결과를 다시 가져올 수 있습니다. 문제가 발생해도 모두 컨테이너에 샌드박싱됩니다.
+
+### Advanced: 다중 모델 오케스트레이션
+
+Claude Code뿐만 아니라 컨테이너에서 다른 AI CLI를 실행할 수 있습니다 - Codex, Gemini CLI 또는 기타. 저는 코드 검토를 위해 OpenAI Codex를 시도했고 잘 작동합니다. 핵심은 호스트 머신에서 직접 이러한 CLI를 실행할 수 없다는 것이 아닙니다 - 분명히 할 수 있습니다. 가치는 Claude Code의 UI/UX가 매끄러워서 그냥 말하고 오케스트레이션을 처리하도록 할 수 있다는 것입니다. 다른 모델 시작, 컨테이너와 호스트 간의 데이터 전송. 터미널 간 수동 전환 및 복사-붙여넣기 대신 Claude Code가 모든 것을 조정하는 중앙 인터페이스가 됩니다.
+
+## Tip 22: The best way to get better at using Claude Code is by using it
+
+최근에 세계적 수준의 암벽 등반가가 다른 암벽 등반가와 인터뷰하는 것을 보았습니다. 그녀는 "암벽 등반을 어떻게 더 잘하게 되었나요?"라고 물었습니다. 그녀는 단순히 "암벽 등반을 하면서요"라고 말했습니다.
+
+저도 이것에 대해 같은 느낌을 받습니다. 물론 비디오를 보고, 책을 읽고, 팁을 배우는 등 보충할 수 있는 것들이 있습니다. 하지만 Claude Code를 사용하는 것이 Claude Code를 사용하는 방법을 배우는 최고의 방법입니다. 일반적으로 AI를 사용하는 것이 AI를 사용하는 방법을 배우는 최고의 방법입니다.
+
+10,000 시간 규칙 대신 10억 토큰 규칙으로 생각하는 것을 좋아합니다. AI에서 더 나아지고 그것이 어떻게 작동하는지 좋은 직관을 얻고 싶다면 가장 좋은 방법은 많은 토큰을 소비하는 것입니다. 그리고 요즘 가능합니다. 특히 Opus 4.5의 경우 충분히 강력하지만 충분히 저렴하여 동시에 여러 세션을 실행할 수 있다는 것을 알게 되었습니다. 토큰 사용량에 대해 그렇게 걱정할 필요가 없으므로 훨씬 더 자유로워집니다.
+
+## Tip 23: Clone/fork and half-clone conversations
+
+때로는 원래 스레드를 잃지 않고 대화의 특정 지점에서 다른 접근 방식을 시도하고 싶을 때가 있습니다. [clone-conversation script](../scripts/clone-conversation.sh)를 사용하면 새 UUID로 대화를 복제하여 분기할 수 있습니다.
+
+**내장된 대안(최신 버전):** Claude Code에는 이제 기본 forking이 있습니다:
+- `/fork` - 대화 내에서 현재 세션을 포크합니다
+- `--fork-session` - `--resume` 또는 `--continue`와 함께 사용 (예: `claude -c --fork-session`)
+
+`--fork-session`에는 단축 형식이 없으므로 `~/.zshrc` 또는 `~/.bashrc`에 이 함수를 추가하여 `--fs`를 단축키로 사용할 수 있습니다:
+
+```bash
+claude() {
+  local args=()
+  for arg in "$@"; do
+    if [[ "$arg" == "--fs" ]]; then
+      args+=("--fork-session")
+    else
+      args+=("$arg")
+    fi
+  done
+  command claude "${args[@]}"
+}
+```
+
+이것은 모든 `claude` 명령을 가로채서 `--fs`를 `--fork-session`으로 확장하고 다른 모든 것은 변경 없이 전달합니다. 별칭과도 작동합니다 ([Tip 7](#tip-7-set-up-terminal-aliases-for-quick-access) 참조): `c -c --fs`, `ch -c --fs` 등.
+
+아래의 clone 스크립트는 이러한 내장 옵션보다 앞서지만 그 아래의 half-clone 스크립트는 컨텍스트를 줄이기 위해 여전히 고유합니다.
+
+첫 번째 메시지는 `[CLONED <timestamp>]`(예: `[CLONED Jan 7 14:30]`)로 태그가 지정되며 `claude -r` 목록과 대화 내부 모두에 표시됩니다.
+
+수동으로 설정하려면 두 파일 모두에 symlink를 만드세요:
+```bash
+ln -s /path/to/this/repo/scripts/clone-conversation.sh ~/.claude/scripts/clone-conversation.sh
+ln -s /path/to/this/repo/skills/clone ~/.claude/skills/clone
+```
+
+또는 [dx plugin](#tip-44-install-the-dx-plugin)을 통해 설치 - symlink가 필요 없습니다.
+
+이제 어떤 대화에서든 `/clone`(또는 플러그인을 사용하는 경우 `/dx:clone`)을 입력하면 Claude가 세션 ID를 찾고 스크립트를 실행합니다.
+
+저는 이것을 광범위하게 테스트했고 복제가 정말 잘 작동합니다.
+
+### 컨텍스트를 줄이기 위한 Half-clone
+
+대화가 너무 길어지면 [half-clone-conversation script](../scripts/half-clone-conversation.sh)는 후반부만 유지합니다. 이것은 최근 작업을 보존하면서 토큰 사용량을 줄입니다. 첫 번째 메시지는 `[HALF-CLONE <timestamp>]`(예: `[HALF-CLONE Jan 7 14:30]`)로 태그가 지정됩니다.
+
+수동으로 설정하려면 두 파일 모두에 symlink를 만드세요:
+```bash
+ln -s /path/to/this/repo/scripts/half-clone-conversation.sh ~/.claude/scripts/half-clone-conversation.sh
+ln -s /path/to/this/repo/skills/half-clone ~/.claude/skills/half-clone
+```
+
+또는 [dx plugin](#tip-44-install-the-dx-plugin)을 통해 설치 - symlink가 필요 없습니다.
+
+### Hook으로 half-clone 자동 제안
+
+선택적으로 [hook](https://docs.anthropic.com/en/docs/claude-code/hooks)을 사용하여 컨텍스트가 너무 길어지면 자동으로 `/half-clone`을 트리거할 수 있습니다. [check-context script](../scripts/check-context.sh)는 모든 Claude 응답 후에 실행되고 컨텍스트 사용량을 확인합니다. 85% 이상이면 Claude에게 `/half-clone`을 실행하라고 알려주는데, 이것은 새 agent가 거기서 계속할 수 있도록 후반부만 있는 새 대화를 만듭니다.
+
+설정하려면 먼저 스크립트를 복사하세요:
+```bash
+cp /path/to/this/repo/scripts/check-context.sh ~/.claude/scripts/check-context.sh
+chmod +x ~/.claude/scripts/check-context.sh
+```
+
+그런 다음 `~/.claude/settings.json`에 hook을 추가하세요:
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/check-context.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+이것은 auto-compact가 비활성화되어야 합니다(`/config` > Auto-compact > false). 그렇지 않으면 Claude Code가 hook이 실행될 기회를 갖기 전에 컨텍스트를 압축할 수 있습니다. 트리거되면 hook이 Claude가 멈추는 것을 차단하고 `/half-clone`을 실행하라고 알립니다. auto-compact에 대한 장점은 half-clone이 결정적이고 빠르다는 것입니다 - 요약하는 대신 실제 메시지를 유지합니다.
+
+### 복제 스크립트에 권장되는 권한
+
+두 복제 스크립트 모두 `~/.claude`(대화 파일 및 기록용)를 읽어야 합니다. 어떤 프로젝트에서 권한 프롬프트를 피하려면 전역 설정(`~/.claude/settings.json`)에 이것을 추가하세요:
+```json
+{
+  "permissions": {
+    "allow": ["Read(~/.claude)"]
+  }
+}
+```
+
+## Tip 24: Use realpath to get absolute paths
+
+Claude Code에 다른 폴더의 파일에 대해 알려줘야 할 때 `realpath`를 사용하여 전체 절대 경로를 얻으세요:
+
+```bash
+realpath some/relative/path
+```
+
+## Tip 25: Understanding CLAUDE.md vs Skills vs Slash Commands vs Plugins
+
+이것들은 약간 비슷한 기능이며 저는 처음에 꽤 혼란스러웠습니다. 저는 그것들을 풀고 머리로 감싸려고 최선을 답했으므로 배운 것을 공유하고 싶었습니다.
+
+**CLAUDE.md**는 가장 간단한 것입니다. 기본 프롬프트로 처리되는 파일들의 묶음으로 무조건 모든 대화의 시작에 로드됩니다. 좋은 점은 단순성입니다. 특정 프로젝트(`./CLAUDE.md`) 또는 전역(`~/.claude/CLAUDE.md`)에서 프로젝트가 무엇인지 설명할 수 있습니다.
+
+**Skills**는 더 잘 구조화된 CLAUDE.md 파일과 같습니다. 관련할 때 Claude가 자동으로 호출하거나 사용자가 슬래시로 수동으로 호출할 수 있습니다(예: `/my-skill`). 예를 들어, 특정 언어로 단어를 발음하는 방법을 물을 때 적절한 서식으로 Google Translate 링크를 여는 skill을 가질 수 있습니다. 이러한 지침이 skill에 있으면 필요할 때만 로드됩니다. CLAUDE.md에 있으면 이미 거기에 공간을 차지하고 있습니다. 따라서 이론적으로 skills는 더 토큰 효율적입니다.
+
+**Slash Commands**는 지침을 별도로 패키징하는 방법이라는 점에서 skills와 유사합니다. 사용자가 수동으로 호출하거나 Claude 자체가 호출할 수 있습니다. 더 정확한 것이 필요하고 자신의 속도로 올바른 시간에 호출하려면 slash commands를 사용하는 도구입니다.
+
+Skills와 slash commands는 기능하는 방식이 꽤 비슷합니다. 차이점은 설계 의도입니다 - skills는 주로 Claude가 사용하도록 설계되었고 slash commands는 주로 사용자가 사용하도록 설계되었습니다. 하지만 그것들은 [병합](https://www.reddit.com/r/ClaudeAI/comments/1q92wwv/merged_commands_and_skills_in_213_update/)되었는데, 제가 [이 변경을 제안](https://github.com/anthropics/claude-code/issues/13115)했기 때문입니다.
+
+**Plugins**는 skills, slash commands, agents, hooks, MCP 서버를 함께 패키징하는 방법입니다. 하지만 plugin이 모든 것을 사용할 필요는 없습니다. Anthropic의 공식 `frontend-design` plugin은 기본적으로 skill일 뿐이며 다른 것은 없습니다. 독립형 skill로 배포될 수 있지만 plugin 형식이 설치하기 쉽습니다.
+
+예를 들어, 저는 이 저장소의 slash commands와 skill을 번들로 묶는 `dx`라는 plugin을 만들었습니다. [Install the dx plugin](#tip-44-install-the-dx-plugin) 섹션에서 작동 방식을 볼 수 있습니다.
+
+## Tip 26: Interactive PR reviews
+
+Claude Code는 PR 검토에 탁월합니다. 절차는 꽤 간단합니다. `gh` 명령을 사용하여 PR 정보를 검색하도록 요청한 다음 원하는 방식대로 검토를 진행할 수 있습니다.
+
+일반적인 검토를 하거나 파일별로 단계별로 진행할 수 있습니다. 속도를 제어합니다. 얼마나 많은 세부 사항을 살펴볼지와 작업할 복잡성 수준을 제어합니다. 일반적인 구조를 이해하고 싶을 수도 있고 테스트도 실행하도록 할 수도 있습니다.
+
+핵심 차이점은 Claude Code가 일회성 기계가 아니라 대화형 PR 검토자로 작동한다는 것입니다. 일부 AI 도구는 일회성 검토에 좋습니다(최신 GPT 모델 포함). 하지만 Claude Code로는 대화를 할 수 있습니다.
+
+## Tip 27: Claude Code as a research tool
+
+Claude Code는 어떤 종류의 연구에도 놀랍습니다. 본질적으로 Google 대체품 또는 심층 연구 대체품이지만 몇 가지 측면에서 더 고급스럽습니다. 특정 GitHub Actions가 실패한 이유를 조사하든(최근에 많이 하고 있습니다), Reddit에서 정서 또는 시장 분석을 하든, 코드베이스를 탐색하든, 무언가를 찾기 위해 공개 정보를 탐색하든 - 그것을 할 수 있습니다.
+
+핵심은 올바른 정보 조각과 해당 정보 조각에 액세스하는 방법에 대한 지침을 제공하는 것입니다. `gh` 터미널 명령 액세스, 컨테이너 접근 방식(Tip 21), Gemini CLI를 통한 Reddit(Tip 11), Slack MCP와 같은 MCP를 통한 개인 정보, Cmd+A / Ctrl+A 방법(Tip 10)일 수 있습니다 - 무엇이든 상관없습니다. 또한 Claude Code가 특정 URL을 로드하는 데 문제가 있는 경우 Playwright MCP 또는 Claude의 기본 브라우저 통합을 시도할 수 있습니다(Tip 9 참조).
+
+사실 저는 [Claude Code를 연구에 사용하여 $10,000를 절약](../content/how-i-saved-10k-with-claude-code.md)할 수 있었습니다.
+
+## Tip 28: Mastering different ways of verifying its output
+
+코드인 경우 출력을 검증하는 한 가지 방법은 테스트를 작성하도록 하고 테스트가 전반적으로 좋아 보이는지 확인하는 것입니다. 그것은 한 방법입니다. 물론 진행하는 동안 생성하는 코드를 Claude Code UI에서 바로 확인할 수 있습니다. 또 다른 것은 GitHub Desktop과 같은 시각적 Git 클라이언트를 사용하는 것입니다. 저는 개인적으로 그것을 사용합니다. 완벽한 제품은 아니지만 변경 사항을 빠르게 확인하기에는 충분합니다. 아마 이 게시물 앞부분에서 언급했듯이 PR을 생성하게 하는 것도 좋은 방법입니다. draft PR을 만들고 실제 PR로 만들기 전에 콘텐츠를 확인하세요.
+
+또 다른 하나는 스스로, 자신의 작업을 확인하게 하는 것입니다. 어떤 종류의 출력을 주면 연구에서 나온 것으로 말하면 "이것에 확신이 있나요? 다시 확인할 수 있나요?"라고 말할 수 있습니다. 제가 좋아하는 프롬프트 중 하나는 "생성한 모든 것, 모든 단일 주장을 다시 확인하고 끝에 확인할 수 있었던 것의 표를 만드세요"라고 말하는 것입니다 - 그리고 그것은 정말 잘 작동하는 것 같습니다.
+
+## Tip 29: Claude Code as a DevOps engineer
+
+이것에 대해 별도의 팁을 만들고 싶었던 특별한 이유가 있습니다. 저에게 정말 놀랐기 때문입니다. GitHub Actions CI 실패가 있을 때마다 Claude Code에 맡기고 "이 문제를 파고들어 근본 원인을 찾으세요"라고 말합니다. 때로는 표면적인 답변을 주지만 계속 묻으면 - 특정 커밋 때문인가, 특정 PR 때문인가, 아니면 불안정한 문제인가? - 손으로 파고들기 어려운 these nasty issues를 파고드는 데 정말 도움이 됩니다. 로그를 통해 헤쳐나가야 하고 수동으로 하는 것은 super painful하지만 Claude Code는 그것의 많은 부분을 처리할 수 있습니다.
+
+저는 이 워크플로우를 `/gha` slash command로 패키징했습니다 - GitHub Actions URL로 `/gha <url>`을 실행하기만 하면 자동으로 실패를 조사, 불안정성 확인, breaking commits 식별, 수정 제안을 합니다. [skills folder](../skills/gha/SKILL.md)에서 찾을 수 있거나 [dx plugin](#tip-44-install-the-dx-plugin)을 통해 설치할 수 있습니다.
+
+특정 문제가 무엇이었는지 식별하면 draft PR을 만들고 앞서 언급한 일부 팁을 진행할 수 있습니다 - 출력을 확인하고 좋아 보이는지 확인하고 자체 출력을 확인한 다음 실제로 문제를 수정하기 위해 실제 PR로 만드세요. 저에게 개인적으로 정말 잘 작동하고 있습니다.
+
+## Tip 30: Keep CLAUDE.md simple and review it periodically
+
+CLAUDE.md를 간단하고 가능한 한 간결하게 유지하는 것이 중요합니다. CLAUDE.md가 전혀 없는 상태로 시작할 수 있습니다. 그리고 Claude Code에게 똑같은 것을 계속 말하고 있다는 것을 발견하면 CLAUDE.md에 추가할 수 있습니다. `#` 기호를 통해 그것을 할 수 있는 옵션이 있다는 것을 알지만 저는 Claude Code에게 프로젝트 수준 CLAUDE.md 또는 전역 CLAUDE.md에 추가하도록 요청하는 것을 선호하면 정확히 무엇을 편집해야 할지 알게 됩니다.
+
+![Keep it simple meme](../assets/keep-it-simple-meme.jpg)
+
+CLAUDE.md 파일을 주기적으로 검토하는 것도 중요합니다. 시간이 지남에 따라 outdated될 수 있기 때문입니다. 예전에는 의미가 있었던 지침이 더 이상 관련이 없을 수 있거나 문서화해야 할 새로운 패턴이 있을 수 있습니다. 저는 최근 대화를 분석하고 CLAUDE.md 파일에 대한 개선을 제안하는 [`review-claudemd`](../skills/review-claudemd/SKILL.md)라는 skill을 만들었습니다.
