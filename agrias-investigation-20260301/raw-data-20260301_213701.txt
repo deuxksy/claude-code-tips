@@ -1,0 +1,869 @@
+╔════════════════════════════════════════════════════════════╗
+║                    SYSTEM INFORMATION                      ║
+╚════════════════════════════════════════════════════════════╝
+Linux GL-MT3000 5.4.211 #0 SMP Tue Aug 19 14:33:21 2025 aarch64 GNU/Linux
+
+NAME="OpenWrt"
+VERSION="21.02-SNAPSHOT"
+ID="openwrt"
+ID_LIKE="lede openwrt"
+PRETTY_NAME="OpenWrt 21.02-SNAPSHOT"
+VERSION_ID="21.02-snapshot"
+HOME_URL="https://openwrt.org/"
+BUG_URL="https://bugs.openwrt.org/"
+SUPPORT_URL="https://forum.openwrt.org/"
+BUILD_ID=""
+OPENWRT_BOARD="mediatek/mt7981"
+OPENWRT_ARCH="aarch64_cortex-a53"
+OPENWRT_TAINTS="busybox override"
+OPENWRT_DEVICE_MANUFACTURER="OpenWrt"
+OPENWRT_DEVICE_MANUFACTURER_URL="https://openwrt.org/"
+OPENWRT_DEVICE_PRODUCT="Generic"
+OPENWRT_DEVICE_REVISION="v0"
+OPENWRT_RELEASE="OpenWrt 21.02-SNAPSHOT "
+
+╔════════════════════════════════════════════════════════════╗
+║                    WIREGUARD STATUS                        ║
+╚════════════════════════════════════════════════════════════╝
+--- Configuration ---
+No WireGuard config found
+
+--- Interface Status ---
+interface: wgclient1
+  public key: 7opq3dCKEeKjDUXBTnVUEgqwnB1Uft8cv3G8bGi24yc=
+  private key: (hidden)
+  listening port: 56861
+  fwmark: 0x8000
+
+peer: bD/m2mdKxJXG2wTkLsmWpiW8xZwkDdrrrwC44auOhQg=
+  endpoint: 93.152.212.49:51820
+  allowed ips: 0.0.0.0/0, ::/0
+  latest handshake: 1 minute, 7 seconds ago
+  transfer: 4.32 MiB received, 2.70 MiB sent
+  persistent keepalive: every 25 seconds
+
+--- Service Status ---
+No wireguard init script
+
+╔════════════════════════════════════════════════════════════╗
+║                    UHTTPD WEB SERVER                       ║
+╚════════════════════════════════════════════════════════════╝
+--- UCI Configuration ---
+uhttpd.main=uhttpd
+uhttpd.main.redirect_https='0'
+uhttpd.main.home='/www'
+uhttpd.main.rfc1918_filter='1'
+uhttpd.main.max_requests='3'
+uhttpd.main.max_connections='100'
+uhttpd.main.cert='/etc/uhttpd.crt'
+uhttpd.main.key='/etc/uhttpd.key'
+uhttpd.main.cgi_prefix='/cgi-bin'
+uhttpd.main.lua_prefix='/cgi-bin/luci=/usr/lib/lua/luci/sgi/uhttpd.lua'
+uhttpd.main.script_timeout='60'
+uhttpd.main.network_timeout='30'
+uhttpd.main.http_keepalive='20'
+uhttpd.main.tcp_keepalive='1'
+uhttpd.main.ubus_prefix='/ubus'
+uhttpd.main.listen_http='127.0.0.1:8080'
+uhttpd.main.listen_https='127.0.0.1:8443'
+uhttpd.defaults=cert
+uhttpd.defaults.days='730'
+uhttpd.defaults.key_type='ec'
+uhttpd.defaults.bits='2048'
+uhttpd.defaults.ec_curve='P-256'
+uhttpd.defaults.country='ZZ'
+uhttpd.defaults.state='Somewhere'
+uhttpd.defaults.location='Unknown'
+uhttpd.defaults.commonname='OpenWrt'
+
+--- Service Status ---
+running
+
+--- Listening Ports ---
+tcp        0      0 127.0.0.1:8080          0.0.0.0:*               LISTEN      1428/uhttpd
+tcp        0      0 127.0.0.1:8443          0.0.0.0:*               LISTEN      1428/uhttpd
+
+╔════════════════════════════════════════════════════════════╗
+║                    FIREWALL CONFIGURATION                  ║
+╚════════════════════════════════════════════════════════════╝
+--- UCI Firewall Config ---
+firewall.@defaults[0]=defaults
+firewall.@defaults[0].syn_flood='1'
+firewall.@defaults[0].input='ACCEPT'
+firewall.@defaults[0].output='ACCEPT'
+firewall.@defaults[0].forward='REJECT'
+firewall.wan_drop_leaked_dns=rule
+firewall.wan_drop_leaked_dns.name='wan_drop_leaked_dns'
+firewall.wan_drop_leaked_dns.src='wan'
+firewall.wan_drop_leaked_dns.proto='udp'
+firewall.wan_drop_leaked_dns.dest_port='53'
+firewall.wan_drop_leaked_dns.mark='!0x8000/0xf000'
+firewall.wan_drop_leaked_dns.target='DROP'
+firewall.wan_drop_leaked_dns.enabled='0'
+firewall.guest_drop_leaked_dns=rule
+firewall.guest_drop_leaked_dns.name='guest_drop_leaked_dns'
+firewall.guest_drop_leaked_dns.src='guest'
+firewall.guest_drop_leaked_dns.proto='udp'
+firewall.guest_drop_leaked_dns.dest_port='53'
+firewall.guest_drop_leaked_dns.mark='!0x8000/0xf000'
+firewall.guest_drop_leaked_dns.target='DROP'
+firewall.guest_drop_leaked_dns.enabled='0'
+firewall.@zone[0]=zone
+firewall.@zone[0].name='lan'
+firewall.@zone[0].network='lan'
+firewall.@zone[0].input='ACCEPT'
+firewall.@zone[0].output='ACCEPT'
+firewall.@zone[0].forward='ACCEPT'
+firewall.@zone[1]=zone
+firewall.@zone[1].name='wan'
+firewall.@zone[1].network='wan' 'wan6' 'wwan'
+firewall.@zone[1].output='ACCEPT'
+firewall.@zone[1].forward='REJECT'
+firewall.@zone[1].masq='1'
+firewall.@zone[1].mtu_fix='1'
+firewall.@zone[1].input='DROP'
+firewall.@forwarding[0]=forwarding
+firewall.@forwarding[0].src='lan'
+firewall.@forwarding[0].dest='wan'
+firewall.@forwarding[0].enabled='1'
+firewall.@rule[2]=rule
+firewall.@rule[2].name='Allow-DHCP-Renew'
+firewall.@rule[2].src='wan'
+firewall.@rule[2].proto='udp'
+firewall.@rule[2].dest_port='68'
+firewall.@rule[2].target='ACCEPT'
+firewall.@rule[2].family='ipv4'
+firewall.@rule[3]=rule
+firewall.@rule[3].name='Allow-IGMP'
+firewall.@rule[3].src='wan'
+firewall.@rule[3].proto='igmp'
+firewall.@rule[3].family='ipv4'
+firewall.@rule[3].target='ACCEPT'
+firewall.@rule[4]=rule
+firewall.@rule[4].name='Allow-DHCPv6'
+firewall.@rule[4].src='wan'
+firewall.@rule[4].proto='udp'
+firewall.@rule[4].dest_port='546'
+firewall.@rule[4].family='ipv6'
+firewall.@rule[4].target='ACCEPT'
+firewall.@rule[5]=rule
+firewall.@rule[5].name='Allow-MLD'
+firewall.@rule[5].src='wan'
+firewall.@rule[5].proto='icmp'
+firewall.@rule[5].src_ip='fe80::/10'
+firewall.@rule[5].icmp_type='130/0' '131/0' '132/0' '143/0'
+firewall.@rule[5].family='ipv6'
+firewall.@rule[5].target='ACCEPT'
+firewall.@rule[6]=rule
+firewall.@rule[6].name='Allow-ICMPv6-Input'
+firewall.@rule[6].src='wan'
+firewall.@rule[6].proto='icmp'
+firewall.@rule[6].limit='1000/sec'
+firewall.@rule[6].family='ipv6'
+firewall.@rule[6].target='ACCEPT'
+firewall.@rule[6].icmp_type='destination-unreachable' 'packet-too-big' 'time-exceeded' 'bad-header' 'unknown-header-type' 'router-solicitation' 'neighbour-solicitation' 'router-advertisement' 'neighbour-advertisement'
+firewall.@rule[7]=rule
+firewall.@rule[7].name='Allow-ICMPv6-Forward'
+firewall.@rule[7].src='wan'
+firewall.@rule[7].dest='*'
+firewall.@rule[7].proto='icmp'
+firewall.@rule[7].icmp_type='echo-request' 'echo-reply' 'destination-unreachable' 'packet-too-big' 'time-exceeded' 'bad-header' 'unknown-header-type'
+firewall.@rule[7].limit='1000/sec'
+firewall.@rule[7].family='ipv6'
+firewall.@rule[7].target='ACCEPT'
+firewall.@rule[8]=rule
+firewall.@rule[8].name='Allow-IPSec-ESP'
+firewall.@rule[8].src='wan'
+firewall.@rule[8].dest='lan'
+firewall.@rule[8].proto='esp'
+firewall.@rule[8].target='ACCEPT'
+firewall.@rule[9]=rule
+firewall.@rule[9].name='Allow-ISAKMP'
+firewall.@rule[9].src='wan'
+firewall.@rule[9].dest='lan'
+firewall.@rule[9].dest_port='500'
+firewall.@rule[9].proto='udp'
+firewall.@rule[9].target='ACCEPT'
+firewall.@rule[10]=rule
+firewall.@rule[10].name='Support-UDP-Traceroute'
+firewall.@rule[10].src='wan'
+
+--- iptables Filter Rules ---
+Chain INPUT (policy ACCEPT 134 packets, 7456 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+34038 7927K ts-input   all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   23 31464 ACCEPT     icmp --  br-lan *       0.0.0.0/0            0.0.0.0/0            icmptype 8 limit: avg 25/sec burst 5
+    3  4104 LOG        icmp --  br-lan *       0.0.0.0/0            0.0.0.0/0            icmptype 8 limit: avg 1/sec burst 5 LOG flags 0 level 4
+    3  4104 DROP       icmp --  br-lan *       0.0.0.0/0            0.0.0.0/0            icmptype 8
+    0     0 ACCEPT     icmp --  br-lan *       0.0.0.0/0            0.0.0.0/0            icmptype 8 limit: avg 25/sec burst 5
+    0     0 LOG        icmp --  br-lan *       0.0.0.0/0            0.0.0.0/0            icmptype 8 limit: avg 1/sec burst 5 LOG flags 0 level 4
+    0     0 DROP       icmp --  br-lan *       0.0.0.0/0            0.0.0.0/0            icmptype 8
+ 1277  154K ACCEPT     all  --  lo     *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+29054 7233K input_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom input rule chain */
+14680 5507K ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED /* !fw3 */
+  169 10536 syn_flood  tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp flags:0x17/0x02 /* !fw3 */
+ 2358  316K zone_lan_input  all  --  br-lan *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+11998 1409K zone_wan_input  all  --  eth0   *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+    0     0 zone_tailscale0_input  all  --  tailscale0 *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+   18  1744 zone_wgclient1_input  all  --  wgclient1 *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain FORWARD (policy DROP 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+18451 6112K ts-forward  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+    0     0 DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0            match-set GL_MAC_BLOCK src
+18393 6112K forwarding_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom forwarding rule chain */
+17344 6012K ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED /* !fw3 */
+ 1049 99963 zone_lan_forward  all  --  br-lan *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+    0     0 zone_wan_forward  all  --  eth0   *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+    0     0 zone_tailscale0_forward  all  --  tailscale0 *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+    0     0 zone_wgclient1_forward  all  --  wgclient1 *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+    0     0 reject     all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+ 1278  154K ACCEPT     all  --  *      lo      0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+20522 8831K output_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom output rule chain */
+17434 8581K ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED /* !fw3 */
+ 1165 94714 zone_lan_output  all  --  *      br-lan  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+ 1082 94338 zone_wan_output  all  --  *      eth0    0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+    8   938 zone_tailscale0_output  all  --  *      tailscale0  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+  833 60559 zone_wgclient1_output  all  --  *      wgclient1  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain forwarding_guest_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain forwarding_lan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain forwarding_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain forwarding_tailscale0_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain forwarding_wan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain forwarding_wgclient1_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain input_guest_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain input_lan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain input_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain input_tailscale0_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain input_wan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain input_wgclient1_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain output_guest_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain output_lan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain output_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain output_tailscale0_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain output_wan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain output_wgclient1_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain reject (3 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 REJECT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */ reject-with tcp-reset
+    0     0 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */ reject-with icmp-port-unreachable
+
+Chain syn_flood (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+  169 10536 RETURN     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp flags:0x17/0x02 limit: avg 25/sec burst 50 /* !fw3 */
+    0     0 DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain ts-forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+   63  6753 MARK       all  --  tailscale0 *       0.0.0.0/0            0.0.0.0/0            MARK xset 0x40000/0xff0000
+   63  6753 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            mark match 0x40000/0xff0000
+    0     0 DROP       all  --  *      tailscale0  100.64.0.0/10        0.0.0.0/0           
+   40  5046 ACCEPT     all  --  *      tailscale0  0.0.0.0/0            0.0.0.0/0           
+
+Chain ts-input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     all  --  lo     *       100.86.91.107        0.0.0.0/0           
+    0     0 RETURN     all  --  !tailscale0 *       100.115.92.0/23      0.0.0.0/0           
+    0     0 DROP       all  --  !tailscale0 *       100.64.0.0/10        0.0.0.0/0           
+ 1826  179K ACCEPT     all  --  tailscale0 *       0.0.0.0/0            0.0.0.0/0           
+ 2117  422K ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:41641
+
+Chain zone_guest_dest_ACCEPT (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain zone_guest_dest_REJECT (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain zone_guest_forward (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 forwarding_guest_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom guest forwarding rule chain */
+    0     0 zone_wan_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Zone guest to wan forwarding policy */
+    0     0 zone_wgclient1_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Zone guest to wgclient1 forwarding policy */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port forwards */
+    0     0 zone_guest_dest_REJECT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_guest_input (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 input_guest_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom guest input rule chain */
+    0     0 ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpts:67:68 /* !fw3: Allow-DHCP */
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:53 /* !fw3: Allow-DNS */
+    0     0 ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:53 /* !fw3: Allow-DNS */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port redirections */
+    0     0 zone_guest_src_REJECT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_guest_output (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 output_guest_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom guest output rule chain */
+    0     0 zone_guest_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_guest_src_REJECT (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain zone_lan_dest_ACCEPT (5 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 1165 94714 ACCEPT     all  --  *      br-lan  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_lan_forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 1049 99963 forwarding_lan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom lan forwarding rule chain */
+ 1049 99963 zone_wan_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Zone lan to wan forwarding policy */
+ 1049 99963 zone_tailscale0_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Zone lan to tailscale0 forwarding policy */
+ 1049 99963 zone_wgclient1_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Zone lan to wgclient1 forwarding policy */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port forwards */
+    0     0 zone_lan_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_lan_input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 2358  316K input_lan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom lan input rule chain */
+    0     0 DROP       udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:53 mark match ! 0x8000/0xf000 /* !fw3: lan_drop_leaked_dns */
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:137 /* !fw3: @rule[12] */
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:138 /* !fw3: @rule[12] */
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:139 /* !fw3: @rule[12] */
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:445 /* !fw3: @rule[12] */
+    0     0 ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:137 /* !fw3: @rule[12] */
+    0     0 ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:138 /* !fw3: @rule[12] */
+    0     0 ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:139 /* !fw3: @rule[12] */
+    0     0 ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:445 /* !fw3: @rule[12] */
+ 1159 82625 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port redirections */
+ 1199  233K zone_lan_src_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_lan_output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 1165 94714 output_lan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom lan output rule chain */
+ 1165 94714 zone_lan_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_lan_src_ACCEPT (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 1064  226K ACCEPT     all  --  br-lan *       0.0.0.0/0            0.0.0.0/0            ctstate NEW,UNTRACKED /* !fw3 */
+
+Chain zone_tailscale0_dest_ACCEPT (3 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    8   938 ACCEPT     all  --  *      tailscale0  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_tailscale0_dest_REJECT (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 reject     all  --  *      tailscale0  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_tailscale0_forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 forwarding_tailscale0_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom tailscale0 forwarding rule chain */
+    0     0 zone_lan_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Zone tailscale0 to lan forwarding policy */
+    0     0 zone_wan_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Zone tailscale0 to wan forwarding policy */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port forwards */
+    0     0 zone_tailscale0_dest_REJECT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_tailscale0_input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 input_tailscale0_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom tailscale0 input rule chain */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port redirections */
+    0     0 zone_tailscale0_src_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_tailscale0_output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    8   938 output_tailscale0_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom tailscale0 output rule chain */
+    8   938 zone_tailscale0_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_tailscale0_src_ACCEPT (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     all  --  tailscale0 *       0.0.0.0/0            0.0.0.0/0            ctstate NEW,UNTRACKED /* !fw3 */
+
+Chain zone_wan_dest_ACCEPT (4 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    9   468 DROP       all  --  *      eth0    0.0.0.0/0            0.0.0.0/0            ctstate INVALID /* !fw3: Prevent NAT leakage */
+ 1073 93870 ACCEPT     all  --  *      eth0    0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wan_dest_REJECT (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 reject     all  --  *      eth0    0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wan_forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 forwarding_wan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wan forwarding rule chain */
+    0     0 zone_lan_dest_ACCEPT  esp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Allow-IPSec-ESP */
+    0     0 zone_lan_dest_ACCEPT  udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:500 /* !fw3: Allow-ISAKMP */
+    0     0 zone_tailscale0_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Zone wan to tailscale0 forwarding policy */
+    0     0 zone_wgclient1_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Zone wan to wgclient1 forwarding policy */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port forwards */
+    0     0 zone_wan_dest_REJECT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wan_input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+11998 1409K input_wan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wan input rule chain */
+    0     0 ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:68 /* !fw3: Allow-DHCP-Renew */
+   72  2304 ACCEPT     2    --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Allow-IGMP */
+    0     0 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:137 /* !fw3: @rule[11] */
+    0     0 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:138 /* !fw3: @rule[11] */
+    0     0 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:139 /* !fw3: @rule[11] */
+    0     0 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:445 /* !fw3: @rule[11] */
+    8   624 DROP       udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:137 /* !fw3: @rule[11] */
+    0     0 DROP       udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:138 /* !fw3: @rule[11] */
+    0     0 DROP       udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:139 /* !fw3: @rule[11] */
+    0     0 DROP       udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:445 /* !fw3: @rule[11] */
+    0     0 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpts:6000:6002 /* !fw3: @rule[13] */
+    0     0 DROP       udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpts:6000:6002 /* !fw3: @rule[13] */
+    0     0 DROP       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:6008 /* !fw3: @rule[14] */
+    0     0 DROP       udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:6008 /* !fw3: @rule[14] */
+    0     0 ACCEPT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            icmptype 8 /* !fw3: @rule[15] */
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:443 /* !fw3: @rule[17] */
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22 /* !fw3: @rule[19] */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port redirections */
+11918 1406K zone_wan_src_DROP  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wan_output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 1082 94338 output_wan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wan output rule chain */
+ 1082 94338 zone_wan_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wan_src_DROP (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+11918 1406K DROP       all  --  eth0   *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wgclient1_dest_ACCEPT (5 references)
+ pkts bytes target     prot opt in     out     source               destination         
+   11   560 DROP       all  --  *      wgclient1  0.0.0.0/0            0.0.0.0/0            ctstate INVALID /* !fw3: Prevent NAT leakage */
+ 1871  160K ACCEPT     all  --  *      wgclient1  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wgclient1_forward (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 forwarding_wgclient1_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wgclient1 forwarding rule chain */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port forwards */
+    0     0 zone_wgclient1_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wgclient1_input (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+   18  1744 input_wgclient1_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wgclient1 input rule chain */
+    0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate DNAT /* !fw3: Accept port redirections */
+   18  1744 zone_wgclient1_src_DROP  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wgclient1_output (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+  833 60559 output_wgclient1_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wgclient1 output rule chain */
+  833 60559 zone_wgclient1_dest_ACCEPT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wgclient1_src_DROP (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+   18  1744 DROP       all  --  wgclient1 *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+--- iptables NAT Rules ---
+Chain PREROUTING (policy ACCEPT 15506 packets, 4538K bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+16758 4652K prerouting_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom prerouting rule chain */
+ 2667  296K zone_lan_prerouting  all  --  br-lan *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+13881 4341K zone_wan_prerouting  all  --  eth0   *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+  201 13846 zone_tailscale0_prerouting  all  --  tailscale0 *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+    9   684 zone_wgclient1_prerouting  all  --  wgclient1 *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+   84  4920 dns_dispatcher  tcp  --  br-+   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:53
+ 1159 82625 dns_dispatcher  udp  --  br-+   *       0.0.0.0/0            0.0.0.0/0            udp dpt:53
+    0     0 dns_dispatcher  tcp  --  ovpnserver *       0.0.0.0/0            0.0.0.0/0            tcp dpt:53
+    0     0 dns_dispatcher  udp  --  ovpnserver *       0.0.0.0/0            0.0.0.0/0            udp dpt:53
+    0     0 dns_dispatcher  tcp  --  wgserver *       0.0.0.0/0            0.0.0.0/0            tcp dpt:53
+    0     0 dns_dispatcher  udp  --  wgserver *       0.0.0.0/0            0.0.0.0/0            udp dpt:53
+
+Chain INPUT (policy ACCEPT 1705 packets, 122K bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain OUTPUT (policy ACCEPT 1695 packets, 131K bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+  106  6763 policy_output  tcp  --  *      *       0.0.0.0/0            0.0.0.0/0           
+ 1561  121K policy_output  udp  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain POSTROUTING (policy ACCEPT 128 packets, 12796 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+ 2726  210K ts-postrouting  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+ 2756  213K postrouting_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom postrouting rule chain */
+  125 13207 zone_lan_postrouting  all  --  *      br-lan  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+  798 62139 zone_wan_postrouting  all  --  *      eth0    0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+    2   189 zone_tailscale0_postrouting  all  --  *      tailscale0  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+ 1812  136K zone_wgclient1_postrouting  all  --  *      wgclient1  0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain adg_redirect (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain dns_dispatcher (6 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0            mark match 0x8/0x8
+ 1243 87545 adg_redirect  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+ 1243 87545 policy_redirect  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+   84  4920 dns_redirect  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain dns_redirect (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain policy_output (2 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 REDIRECT   tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            mark match 0x1000/0xf000 owner UID match 453 tcp dpt:53 redir ports 2153
+    0     0 REDIRECT   udp  --  *      *       0.0.0.0/0            0.0.0.0/0            mark match 0x1000/0xf000 owner GID match 10000 udp dpt:53 redir ports 2153
+
+Chain policy_redirect (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 1159 82625 REDIRECT   udp  --  *      *       0.0.0.0/0            0.0.0.0/0            mark match 0x1000/0xf000 ADDRTYPE match dst-type LOCAL redir ports 2153
+
+Chain postrouting_guest_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain postrouting_lan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain postrouting_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain postrouting_tailscale0_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain postrouting_wan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain postrouting_wgclient1_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain prerouting_guest_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain prerouting_lan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain prerouting_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain prerouting_tailscale0_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain prerouting_wan_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain prerouting_wgclient1_rule (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain ts-postrouting (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+   34  2326 MASQUERADE  all  --  *      *       0.0.0.0/0            0.0.0.0/0            mark match 0x40000/0xff0000
+
+Chain zone_guest_postrouting (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 postrouting_guest_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom guest postrouting rule chain */
+
+Chain zone_guest_prerouting (0 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 prerouting_guest_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom guest prerouting rule chain */
+
+Chain zone_lan_postrouting (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+  125 13207 postrouting_lan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom lan postrouting rule chain */
+
+Chain zone_lan_prerouting (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 2667  296K prerouting_lan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom lan prerouting rule chain */
+
+Chain zone_tailscale0_postrouting (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    2   189 postrouting_tailscale0_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom tailscale0 postrouting rule chain */
+
+Chain zone_tailscale0_prerouting (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+  201 13846 prerouting_tailscale0_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom tailscale0 prerouting rule chain */
+
+Chain zone_wan_postrouting (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+  798 62139 postrouting_wan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wan postrouting rule chain */
+  798 62139 MASQUERADE  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wan_prerouting (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+13881 4341K prerouting_wan_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wan prerouting rule chain */
+
+Chain zone_wgclient1_postrouting (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+ 1812  136K postrouting_wgclient1_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wgclient1 postrouting rule chain */
+ 1812  136K MASQUERADE  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3 */
+
+Chain zone_wgclient1_prerouting (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    9   684 prerouting_wgclient1_rule  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* !fw3: Custom wgclient1 prerouting rule chain */
+
+╔════════════════════════════════════════════════════════════╗
+║                    NETWORK INTERFACES                      ║
+╚════════════════════════════════════════════════════════════╝
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 94:83:c4:5f:4d:b8 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.103/24 brd 192.168.1.255 scope global eth0
+       valid_lft forever preferred_lft forever
+3: eth1: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel master br-lan state DOWN group default qlen 1000
+    link/ether 94:83:c4:5f:4d:b9 brd ff:ff:ff:ff:ff:ff
+4: ra0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master br-lan state UP group default qlen 1000
+    link/ether aa:d5:4f:0a:d3:c0 brd ff:ff:ff:ff:ff:ff
+6: ra1: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel state DOWN group default qlen 1000
+    link/ether 96:83:c4:5f:4d:ba brd ff:ff:ff:ff:ff:ff
+7: rax0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master br-lan state UNKNOWN group default qlen 1000
+    link/ether 22:81:ef:86:09:27 brd ff:ff:ff:ff:ff:ff
+8: rax1: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel state DOWN group default qlen 1000
+    link/ether 96:83:c4:5f:4d:bb brd ff:ff:ff:ff:ff:ff
+9: apcli0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN group default qlen 1000
+    link/ether 92:83:c4:5f:4d:ba brd ff:ff:ff:ff:ff:ff
+10: apclix0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN group default qlen 1000
+    link/ether 9e:83:c4:5f:4d:ba brd ff:ff:ff:ff:ff:ff
+14: br-lan: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 94:83:c4:5f:4d:b9 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.8.1/24 brd 192.168.8.255 scope global br-lan
+       valid_lft forever preferred_lft forever
+16: wgclient1: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1350 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/none 
+    inet 10.14.0.2/8 brd 10.255.255.255 scope global wgclient1
+       valid_lft forever preferred_lft forever
+17: tailscale0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1280 qdisc fq_codel state UNKNOWN group default qlen 500
+    link/none 
+    inet 100.86.91.107/32 scope global tailscale0
+       valid_lft forever preferred_lft forever
+
+--- Routing Table ---
+default via 192.168.1.1 dev eth0 proto static src 192.168.1.103 metric 10 
+100.64.0.0/10 dev tailscale0 scope link 
+192.168.1.0/24 dev eth0 proto static scope link metric 10 
+192.168.8.0/24 dev br-lan proto kernel scope link src 192.168.8.1 
+
+--- Network Config ---
+network.loopback=interface
+network.loopback.device='lo'
+network.loopback.proto='static'
+network.loopback.ipaddr='127.0.0.1'
+network.loopback.netmask='255.0.0.0'
+network.globals=globals
+network.globals.ula_prefix='fdf1:9c0b:f2b3::/48'
+network.@device[0]=device
+network.@device[0].name='br-lan'
+network.@device[0].type='bridge'
+network.@device[0].ports='eth1'
+network.@device[0].macaddr='94:83:c4:5f:4d:b9'
+network.@device[0].igmp_snooping='1'
+network.@device[1]=device
+network.@device[1].name='eth1'
+network.@device[1].macaddr='94:83:c4:5f:4d:b9'
+network.lan=interface
+network.lan.device='br-lan'
+network.lan.proto='static'
+network.lan.ipaddr='192.168.8.1'
+network.lan.netmask='255.255.255.0'
+network.lan.ip6assign='60'
+network.lan.isolate='0'
+network.@device[2]=device
+network.@device[2].name='eth0'
+network.@device[2].macaddr='94:83:c4:5f:4d:b8'
+network.wan=interface
+network.wan.device='eth0'
+network.wan.proto='dhcp'
+network.wan.force_link='0'
+network.wan.ipv6='0'
+network.wan.classlessroute='0'
+network.wan.metric='10'
+network.wan6=interface
+network.wan6.proto='dhcpv6'
+network.wan6.device='@wan'
+network.wan6.disabled='1'
+network.guest=interface
+network.guest.force_link='1'
+network.guest.type='bridge'
+network.guest.proto='static'
+network.guest.ipaddr='192.168.9.1'
+network.guest.netmask='255.255.255.0'
+network.guest.ip6assign='60'
+network.guest.multicast_querier='1'
+network.guest.isolate='0'
+network.guest.bridge_empty='1'
+network.guest.disabled='1'
+network.guest.igmp_snooping='1'
+network.policy_relay_lo_rt_lan=rule
+
+╔════════════════════════════════════════════════════════════╗
+║                    VPN STATUS                             ║
+╚════════════════════════════════════════════════════════════╝
+--- Tailscale ---
+100.86.91.107   agrias               ksymailing@  linux   -
+100.81.167.92   13-mini              ksymailing@  iOS     -
+100.112.63.2    deck                 ksymailing@  linux   -
+100.122.60.35   deneb                ksymailing@  linux   idle; offers exit node
+100.123.158.20  heritage             tagged-devices linux   -
+100.80.7.31     ion-dxp-bastion      ksymailing@  linux   -
+100.110.172.36  m1-pro               ksymailing@  iOS     -
+100.112.2.50    mini                 ksymailing@  macOS   active; offers exit node; direct 192.168.1.104:41641, tx 138188 rx 51220
+100.111.235.71  surface              ksymailing@  windows offline
+100.79.219.51   z-5                  ksymailing@  android -
+
+--- Tailscale IPs ---
+100.86.91.107
+fd7a:115c:a1e0::bb32:5b6b
+
+--- Surfshark Process ---
+No Surfshark process found
+
+╔════════════════════════════════════════════════════════════╗
+║                    INSTALLED PACKAGES                     ║
+╚════════════════════════════════════════════════════════════╝
+firewall - 2021-03-23-61db17ed-1.2
+gl-sdk4-firewall - git-2025.219.32390-9bb5750-1
+gl-sdk4-luci - git-2025.224.24679-7c2828d-1
+gl-sdk4-tailscale - git-2025.115.15781-4b8df63-1
+gl-sdk4-ui-firewallview - git-2025.162.37381-9033056-1
+gl-sdk4-ui-tailscaleview - git-2025.155.04603-c86dc60-1
+kmod-wireguard - 5.4.211-1
+openvpn-openssl - 2.6.12-1
+tailscale - 1.80.3-1
+uhttpd - 2021-03-21-15346de8-2
+uhttpd-mod-ubus - 2021-03-21-15346de8-2
+wireguard-tools - 1.0.20210223-2
+
+╔════════════════════════════════════════════════════════════╗
+║                    RUNNING SERVICES                       ║
+╚════════════════════════════════════════════════════════════╝
+adguardhome
+at_cache_init
+avahi-daemon
+boot
+carrier-monitor
+cron
+dbus
+disk_manage
+dnscrypt-proxy
+dnscrypt-proxy-vpn
+dnsmasq
+done
+dropbear
+edgerouter
+fcgiwrap
+firewall
+fix-mtk-eth
+fix-qsdk-eth
+fix-qsdk-phy
+fstab
+
+╔════════════════════════════════════════════════════════════╗
+║                    ACTIVE CONNECTIONS                     ║
+╚════════════════════════════════════════════════════════════╝
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1607/nginx.conf -g 
+tcp        0      0 127.0.0.1:8080          0.0.0.0:*               LISTEN      1428/uhttpd
+tcp        0      0 100.86.91.107:53        0.0.0.0:*               LISTEN      26215/dnsmasq
+tcp        0      0 10.14.0.2:53            0.0.0.0:*               LISTEN      26215/dnsmasq
+tcp        0      0 127.0.0.1:53            0.0.0.0:*               LISTEN      26215/dnsmasq
+tcp        0      0 192.168.1.103:53        0.0.0.0:*               LISTEN      26215/dnsmasq
+tcp        0      0 192.168.8.1:53          0.0.0.0:*               LISTEN      26215/dnsmasq
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1356/dropbear
+tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN      1607/nginx.conf -g 
+tcp        0      0 127.0.0.1:8443          0.0.0.0:*               LISTEN      1428/uhttpd
+tcp        0      0 100.86.91.107:46943     0.0.0.0:*               LISTEN      27076/tailscaled
+tcp        0      0 100.86.91.107:2153      0.0.0.0:*               LISTEN      26216/dnsmasq
+tcp        0      0 10.14.0.2:2153          0.0.0.0:*               LISTEN      26216/dnsmasq
+tcp        0      0 127.0.0.1:2153          0.0.0.0:*               LISTEN      26216/dnsmasq
+tcp        0      0 192.168.1.103:2153      0.0.0.0:*               LISTEN      26216/dnsmasq
+tcp        0      0 192.168.8.1:2153        0.0.0.0:*               LISTEN      26216/dnsmasq
+tcp        0      0 :::80                   :::*                    LISTEN      1607/nginx.conf -g 
+tcp        0      0 ::1:53                  :::*                    LISTEN      26215/dnsmasq
+tcp        0      0 :::22                   :::*                    LISTEN      1356/dropbear
+tcp        0      0 :::443                  :::*                    LISTEN      1607/nginx.conf -g 
+tcp        0      0 ::1:2153                :::*                    LISTEN      26216/dnsmasq
+udp        0      0 0.0.0.0:56861           0.0.0.0:*                           -
+udp        0      0 100.86.91.107:53        0.0.0.0:*                           26215/dnsmasq
+udp        0      0 10.14.0.2:53            0.0.0.0:*                           26215/dnsmasq
+udp        0      0 127.0.0.1:53            0.0.0.0:*                           26215/dnsmasq
+udp        0      0 192.168.1.103:53        0.0.0.0:*                           26215/dnsmasq
+udp        0      0 192.168.8.1:53          0.0.0.0:*                           26215/dnsmasq
+udp        0      0 0.0.0.0:67              0.0.0.0:*                           26215/dnsmasq
+
+╔════════════════════════════════════════════════════════════╗
+║                    RECENT LOGS                            ║
+╚════════════════════════════════════════════════════════════╝
+Sun Mar  1 21:23:38 2026 kern.notice kernel: [ 4474.254060] 7981@C08L3,ap_cmm_peer_assoc_req_action() 1714:  Recv Assoc from STA - 92:37:fd:ab:ae:9e
+Sun Mar  1 21:23:38 2026 kern.notice kernel: [ 4474.263320] 7981@C08L3,ap_cmm_peer_assoc_req_action() 2241: ReASSOC Send ReASSOC response (Status=0)...
+Sun Mar  1 21:23:38 2026 kern.notice kernel: [ 4474.272783] 7981@C01L3,wifi_sys_conn_act() 1115: wdev idx = 2
+Sun Mar  1 21:23:38 2026 kern.notice kernel: [ 4474.278822] 7981@C08L3,hw_ctrl_flow_v2_connt_act() 215: wdev_idx=2
+Sun Mar  1 21:23:38 2026 kern.notice kernel: [ 4474.407203] 7981@C15L3,WPABuildPairMsg1() 5310: <=== send Msg1 of 4-way
+Sun Mar  1 21:23:38 2026 kern.notice kernel: [ 4474.413829] 7981@C15L3,PeerPairMsg2Action() 6303: ===>Receive msg 2
+Sun Mar  1 21:23:39 2026 kern.notice kernel: [ 4475.422931] 7981@C15L3,WPABuildPairMsg1() 5310: <=== send Msg1 of 4-way
+Sun Mar  1 21:23:39 2026 kern.notice kernel: [ 4475.429555] 7981@C15L3,PeerPairMsg2Action() 6303: ===>Receive msg 2
+Sun Mar  1 21:23:40 2026 kern.notice kernel: [ 4476.446678] 7981@C15L3,WPABuildPairMsg1() 5310: <=== send Msg1 of 4-way
+Sun Mar  1 21:23:40 2026 kern.notice kernel: [ 4476.453303] 7981@C15L3,PeerPairMsg2Action() 6303: ===>Receive msg 2
+Sun Mar  1 21:23:41 2026 kern.err kernel: [ 4477.469722] 7981@C15L1,WpaEAPOLRetryAction() 7790: 4Way-MSG1 timeout with 92:37:fd:ab:ae:9e
+Sun Mar  1 21:23:41 2026 kern.notice kernel: [ 4477.478079] 7981@C15L3,MlmeDeAuthAction() 1404: Send DEAUTH frame with ReasonCode(2) to 92:37:fd:ab:ae:9e
+Sun Mar  1 21:23:41 2026 kern.warn kernel: [ 4477.487713] 7981@C01L2,wifi_sys_disconn_act() 1002:  wdev_idx=2
+Sun Mar  1 21:23:41 2026 kern.notice kernel: [ 4477.493888] 7981@C08L3,hw_ctrl_flow_v2_disconnt_act() 172: wdev_idx=2
+Sun Mar  1 21:23:41 2026 kern.warn kernel: [ 4477.501048] 7981@C13L2,MacTableDeleteEntry() 1938: Del Sta:92:37:fd:ab:ae:9e
+Sun Mar  1 21:23:41 2026 kern.debug kernel: [ 4477.590333] entrytb_aid_aquire(): found non-occupied aid:4, allocated from:4
+Sun Mar  1 21:23:41 2026 kern.warn kernel: [ 4477.597395] 7981@C13L2,MacTableInsertEntry() 1577: New Sta:92:37:fd:ab:ae:9e
+Sun Mar  1 21:23:41 2026 kern.err kernel: [ 4477.606345] 7981@C08L1,PeerAssocReqCmmSanity() 1501: IE_WLAN_EXTENSION: no handler for extension_id:137
+Sun Mar  1 21:23:41 2026 kern.notice kernel: [ 4477.615754] 7981@C08L3,ap_cmm_peer_assoc_req_action() 1714:  Recv Assoc from STA - 92:37:fd:ab:ae:9e
+Sun Mar  1 21:23:41 2026 kern.notice kernel: [ 4477.625024] 7981@C08L3,ap_cmm_peer_assoc_req_action() 2241: ReASSOC Send ReASSOC response (Status=0)...
+Sun Mar  1 21:23:41 2026 kern.notice kernel: [ 4477.634477] 7981@C01L3,wifi_sys_conn_act() 1115: wdev idx = 2
+Sun Mar  1 21:23:41 2026 kern.notice kernel: [ 4477.640510] 7981@C08L3,hw_ctrl_flow_v2_connt_act() 215: wdev_idx=2
+Sun Mar  1 21:23:41 2026 kern.notice kernel: [ 4477.770412] 7981@C15L3,WPABuildPairMsg1() 5310: <=== send Msg1 of 4-way
+Sun Mar  1 21:23:41 2026 kern.notice kernel: [ 4477.777201] 7981@C15L3,PeerPairMsg2Action() 6303: ===>Receive msg 2
+Sun Mar  1 21:23:42 2026 kern.notice kernel: [ 4478.782101] 7981@C15L3,WPABuildPairMsg1() 5310: <=== send Msg1 of 4-way
+Sun Mar  1 21:23:42 2026 kern.notice kernel: [ 4478.788796] 7981@C15L3,PeerPairMsg2Action() 6303: ===>Receive msg 2
+Sun Mar  1 21:23:44 2026 kern.notice kernel: [ 4479.805929] 7981@C15L3,WPABuildPairMsg1() 5310: <=== send Msg1 of 4-way
+Sun Mar  1 21:23:44 2026 kern.notice kernel: [ 4479.812612] 7981@C15L3,PeerPairMsg2Action() 6303: ===>Receive msg 2
+Sun Mar  1 21:23:45 2026 kern.err kernel: [ 4480.828862] 7981@C15L1,WpaEAPOLRetryAction() 7790: 4Way-MSG1 timeout with 92:37:fd:ab:ae:9e
+Sun Mar  1 21:23:45 2026 kern.notice kernel: [ 4480.837221] 7981@C15L3,MlmeDeAuthAction() 1404: Send DEAUTH frame with ReasonCode(2) to 92:37:fd:ab:ae:9e
+Sun Mar  1 21:23:45 2026 kern.warn kernel: [ 4480.846897] 7981@C01L2,wifi_sys_disconn_act() 1002:  wdev_idx=2
+Sun Mar  1 21:23:45 2026 kern.notice kernel: [ 4480.853074] 7981@C08L3,hw_ctrl_flow_v2_disconnt_act() 172: wdev_idx=2
+Sun Mar  1 21:23:45 2026 kern.warn kernel: [ 4480.860213] 7981@C13L2,MacTableDeleteEntry() 1938: Del Sta:92:37:fd:ab:ae:9e
+Sun Mar  1 21:35:08 2026 authpriv.info dropbear[13564]: Child connection from 100.112.2.50:51178
+Sun Mar  1 21:35:09 2026 authpriv.notice dropbear[13564]: Pubkey auth succeeded for 'root' with ssh-ed25519 key SHA256:SX+e5TZJWlUAZnLqyPZh0seLH7Kgu0uVPLnsHrp2ZTE from 100.112.2.50:51178
+Sun Mar  1 21:36:39 2026 authpriv.info dropbear[14459]: Child connection from 100.112.2.50:51212
+Sun Mar  1 21:36:39 2026 authpriv.notice dropbear[14459]: Pubkey auth succeeded for 'root' with ssh-ed25519 key SHA256:SX+e5TZJWlUAZnLqyPZh0seLH7Kgu0uVPLnsHrp2ZTE from 100.112.2.50:51212
+Sun Mar  1 21:36:39 2026 kern.err kernel: [ 5255.591904] 7981@C12L1,rt28xx_ap_ioctl() 814: RT_PRIV_IOCTL interface is down, cmd [8b27] return!!!
+Sun Mar  1 21:36:40 2026 kern.err kernel: [ 5255.603956] 7981@C12L1,rt28xx_ap_ioctl() 814: RT_PRIV_IOCTL interface is down, cmd [8b27] return!!!
+Sun Mar  1 21:36:40 2026 authpriv.info dropbear[14459]: Exit (root) from <100.112.2.50:51212>: Disconnect received
+Sun Mar  1 21:36:45 2026 authpriv.info dropbear[14538]: Child connection from 100.112.2.50:51213
+Sun Mar  1 21:36:45 2026 authpriv.info dropbear[14538]: Exit before auth from <100.112.2.50:51213>: Exited normally
+Sun Mar  1 21:36:47 2026 authpriv.info dropbear[14555]: Child connection from 100.112.2.50:51215
+Sun Mar  1 21:36:47 2026 authpriv.notice dropbear[14555]: Pubkey auth succeeded for 'root' with ssh-ed25519 key SHA256:SX+e5TZJWlUAZnLqyPZh0seLH7Kgu0uVPLnsHrp2ZTE from 100.112.2.50:51215
+Sun Mar  1 21:36:47 2026 authpriv.info dropbear[14555]: Exit (root) from <100.112.2.50:51215>: Disconnect received
+Sun Mar  1 21:36:53 2026 authpriv.info dropbear[14605]: Child connection from 100.112.2.50:51216
+Sun Mar  1 21:36:53 2026 authpriv.notice dropbear[14605]: Pubkey auth succeeded for 'root' with ssh-ed25519 key SHA256:SX+e5TZJWlUAZnLqyPZh0seLH7Kgu0uVPLnsHrp2ZTE from 100.112.2.50:51216
+Sun Mar  1 21:36:53 2026 authpriv.info dropbear[14605]: Exit (root) from <100.112.2.50:51216>: Disconnect received
+Sun Mar  1 21:37:01 2026 authpriv.info dropbear[14720]: Child connection from 100.112.2.50:51217
+Sun Mar  1 21:37:01 2026 authpriv.notice dropbear[14720]: Pubkey auth succeeded for 'root' with ssh-ed25519 key SHA256:SX+e5TZJWlUAZnLqyPZh0seLH7Kgu0uVPLnsHrp2ZTE from 100.112.2.50:51217
