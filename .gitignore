@@ -1,3 +1,6 @@
 .DS_Store
 node_modules/
 .mcp.json
+.mcp.json.*
+.omc/
+.playwright-mcp/
