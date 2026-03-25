@@ -1,7 +1,5 @@
 # Claude Code 45가지 팁: 기초부터 고급까지
 
-[English](../README.md) | [한국어](ko/README.md)
-
 Claude Code를 최대한 활용하기 위한 팁입니다. 커스텀 status line 스크립트, 시스템 프롬프트 절반으로 줄이기, Gemini CLI를 Claude Code의 minion으로 사용하기, 컨테이너에서 Claude Code 자체 실행하기 등. 또한 [dx plugin](#tip-44-install-the-dx-plugin) 포함.
 
 📺 [빠른 데모](https://www.youtube.com/watch?v=hiISl558JGE) - 다중 Claude 워크플로우와 음성 입력으로 일부 팁 시연:
