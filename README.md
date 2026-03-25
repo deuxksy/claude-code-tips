@@ -171,6 +171,8 @@ I think the best way to think about this is like you're trying to communicate wi
 
 A common objection is "what if you're in a room with other people?" I just whisper using earphones - I personally like Apple EarPods (not AirPods). They're affordable, high quality enough, and you just whisper into them quietly. I've done it in front of other people and it works well. In offices, people talk anyway - instead of talking to coworkers, you're talking quietly to your voice transcription system. I don't think there's any problem with that. This method works so well that it even works on a plane. It's loud enough that other people won't hear you, but if you speak close enough to the mic, your local model can still understand what you're saying. (In fact, I'm writing this very paragraph using that method on a flight.)
 
+**Update:** Claude Code now has a [built-in voice mode](https://x.com/bcherny/status/2032238378389840018). I tested it and it works well, but I still personally use a local model because I find it faster.
+
 ## Tip 3: Break down large problems into smaller ones
 
 This is one of the most important concepts to master. It's exactly the same as traditional software engineering - the best software engineers already know how to do this, and it applies to Claude Code too.
@@ -400,7 +402,7 @@ Sometimes you want to give Claude Code a URL, but it can't access it directly. M
 
 This works great for terminal output too. When I have output from Claude Code itself or any other CLI application, I can use the same trick: select all, copy, and paste it back to CC. Pretty helpful.
 
-Some pages don't lend themselves well to select all by default - but there are tricks to get them into a better state first. For example, with Gmail threads, click Print All to get the print preview (but cancel the actual print). That page shows all emails in the thread expanded, so you can Cmd+A the entire conversation cleanly.
+Some pages don't lend themselves well to select all by default - but there are tricks to get them into a better state first. For example, with Gmail threads, click Print All to get the print preview (but cancel the actual print). That page shows all emails in the thread expanded, so you can Cmd+A the entire conversation cleanly. For asking questions about a YouTube video or summarizing it, you can click "Show transcript" on a YouTube video and then do Cmd+A or Ctrl+A.
 
 This applies to any AI, not just Claude Code.
 
@@ -744,7 +746,7 @@ The key difference is that Claude Code acts as an interactive PR reviewer, not j
 
 Claude Code is amazing for any sort of research. It's essentially a Google replacement or deep research replacement, but more advanced in a few different ways. Whether you're researching why certain GitHub Actions failed (which I've been doing a lot recently), doing sentiment or market analysis on Reddit, exploring your codebase, or exploring public information to find something - it's able to do that.
 
-The key is giving it the right pieces of information and instructions about how to access those pieces of information. It might be `gh` terminal command access, or the container approach (Tip 21), or Reddit through Gemini CLI (Tip 11), or private information through an MCP like Slack MCP, or the Cmd+A / Ctrl+A method (Tip 10) - whatever it is. Additionally, if Claude Code has trouble loading certain URLs, you can try using Playwright MCP or Claude's native browser integration (see Tip 9).
+The key is giving it the right pieces of information and instructions about how to access those pieces of information. It might be `gh` terminal command access, or the container approach (Tip 21), or Reddit through Gemini CLI (Tip 11), or private information through an MCP like Slack MCP, or the Cmd+A / Ctrl+A method (Tip 10) - whatever it is. Additionally, if Claude Code has trouble loading certain URLs, you can try using Playwright MCP or Claude's native browser integration (see Tip 9). For scientific research, I created a [paper-search](https://github.com/ykdojo/paper-search) plugin for searching academic papers.
 
 In fact, I was even able to [save $10,000 by using Claude Code for research](content/how-i-saved-10k-with-claude-code.md).
 
