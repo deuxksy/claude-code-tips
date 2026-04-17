@@ -79,27 +79,27 @@ MobileDeviceUpdater: _findMatchingLocationID: Failure to create 'locationID' pro
 
 ```mermaid
 timeline
-    title DFU Restore 시스템 로그 타임라인
-    section DFU 연결 불안정 (17:41:19~22)
-        17:41:19.472 : DFU device attached
-        17:41:19.474 : ⚠️ _findMatchingLocationID 실패
-        17:41:19.742 : DFU disconnected (0.5초)
-        17:41:20.634 : DFU 재연결
-        17:41:20.638 : ⚠️ _findMatchingLocationID 실패
-        17:41:21.170 : DFU disconnected (0.5초)
-        17:41:22.059 : DFU 재연결
-        17:41:22.063 : ⚠️ _findMatchingLocationID 실패
-    section Restore 진행 (17:41~43:04)
-        Steps 1-3 : 완료
-        Step 4 : 66% 진행
-    section DFU→Recovery 전환
-        17:43:04.685 : DFU mode disconnected
-        17:43:05.639 : ✅ Recovery Mode attached
-        17:43:05.648 : _AMRecoveryDeviceConnected
-        17:43:05.664 : Known, supported device
-        17:43:07.134 : ❌ Recovery disconnected (1.5초)
-        17:43:07.135 : ⚠️ timer interval to 0
-        17:43:17.406 : cfgutil exit handler
+    title DFU Restore System Log Timeline
+    section DFU Unstable
+        19.472 : DFU device attached
+        19.474 : _findMatchingLocationID FAIL
+        19.742 : DFU disconnected - 0.5s
+        20.634 : DFU re-attached
+        20.638 : _findMatchingLocationID FAIL
+        21.170 : DFU disconnected - 0.5s
+        22.059 : DFU re-attached
+        22.063 : _findMatchingLocationID FAIL
+    section Restore Progress
+        Step 1-3 : Complete
+        Step 4 : 66pct then fail
+    section DFU to Recovery
+        04.685 : DFU mode disconnected
+        05.639 : Recovery Mode attached OK
+        05.648 : AMRecoveryDeviceConnected
+        05.664 : Known supported device
+        07.134 : Recovery disconnected - 1.5s
+        07.135 : timer interval to 0
+        17.406 : cfgutil exit handler
 ```
 
 ```
